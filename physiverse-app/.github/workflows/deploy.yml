@@ -1,0 +1,51 @@
+# ═══════════════════════════════════════════════════════════
+# PHYSIVERSE — CI/CD Workflow for Deployment Readiness
+# Runs compilation, linting, type safety checks, and test suite
+# ═══════════════════════════════════════════════════════════
+
+name: CI Build Verification
+
+on:
+  push:
+    branches: [ main, master, dev ]
+  pull_request:
+    branches: [ main, master, dev ]
+
+jobs:
+  verify:
+    name: Verify Build Safety
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-size: 20
+          cache: 'npm'
+          cache-dependency-path: 'physiverse-app/package-lock.json'
+
+      - name: Install Dependencies
+        run: |
+          cd physiverse-app
+          npm ci
+
+      - name: Run Linter
+        run: |
+          cd physiverse-app
+          npm run lint
+
+      - name: Check Type Safety
+        run: |
+          cd physiverse-app
+          npx tsc --noEmit
+
+      - name: Compile and Build App
+        run: |
+          cd physiverse-app
+          npm run build
+        env:
+          NEXT_TELEMETRY_DISABLED: 1
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}

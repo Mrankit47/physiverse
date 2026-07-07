@@ -666,7 +666,7 @@ export default function HomePage() {
               <motion.div
                 key={plan.name}
                 variants={fadeUp}
-                className={`relative card-surface p-8 ${plan.popular ? 'ring-2' : ''}`}
+                className={`relative card-surface p-8 flex flex-col ${plan.popular ? 'ring-2' : ''}`}
                 style={plan.popular ? { borderColor: 'var(--color-primary)', boxShadow: 'var(--shadow-glow)' } : {}}
               >
                 {plan.popular && (
@@ -686,7 +686,7 @@ export default function HomePage() {
                     <span className="text-sm" style={{ color: 'var(--text-muted)' }}>{plan.period}</span>
                   )}
                 </div>
-                <ul className="space-y-3 mb-8">
+                <ul className="space-y-3 mb-8 flex-1">
                   {plan.features.map((f) => (
                     <li key={f} className="flex items-start gap-2.5 text-sm text-left" style={{ color: 'var(--text-body)' }}>
                       <Check className="w-4 h-4 shrink-0 mt-0.5" style={{ color: 'var(--color-success)' }} />
@@ -695,7 +695,7 @@ export default function HomePage() {
                   ))}
                 </ul>
                 <button
-                  className="w-full py-3 rounded-xl text-sm font-semibold transition-all"
+                  className="w-full py-3 rounded-xl text-sm font-semibold transition-all mt-auto"
                   style={
                     plan.popular
                       ? { background: 'var(--gradient-primary)', color: 'white' }

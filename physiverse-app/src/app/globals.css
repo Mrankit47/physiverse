@@ -134,38 +134,39 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   Base Styles
+   Base Styles — wrapped in @layer base so Tailwind utility
+   classes (padding, margin, spacing) always take precedence
    ═══════════════════════════════════════════════════════════════ */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
 
-html {
-  scroll-behavior: smooth;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 
-body {
-  font-family: var(--font-body);
-  background-color: var(--bg-primary);
-  color: var(--text-body);
-  transition: background-color 0.3s ease, color 0.3s ease;
-  overflow-x: hidden;
-}
+  body {
+    font-family: var(--font-body);
+    background-color: var(--bg-primary);
+    color: var(--text-body);
+    transition: background-color 0.3s ease, color 0.3s ease;
+    overflow-x: hidden;
+  }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-heading);
-  color: var(--text-heading);
-  font-weight: 700;
-  line-height: 1.2;
-  letter-spacing: -0.02em;
-}
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    color: var(--text-heading);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
 
-code, pre, .font-mono {
-  font-family: var(--font-mono);
+  code, pre, .font-mono {
+    font-family: var(--font-mono);
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════

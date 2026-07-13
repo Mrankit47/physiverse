@@ -96,7 +96,7 @@
   --shadow-xl: 0 16px 50px rgba(0, 0, 0, 0.1);
   --shadow-glow: 0 0 40px rgba(255, 122, 0, 0.15);
 
-  --gradient-hero: linear-gradient(135deg, #0B1120 0%, #1a1a3e 50%, #0B1120 100%);
+  --gradient-hero: linear-gradient(135deg, #F0F4F8 0%, #FFFFFF 50%, #F7FAFC 100%);
   --gradient-primary: linear-gradient(135deg, #FF7A00, #FF9E40);
   --gradient-accent: linear-gradient(135deg, #3B82F6, #60A5FA);
   --gradient-surface: linear-gradient(180deg, #FAFBFC 0%, #F3F4F6 100%);

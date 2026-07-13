@@ -11,14 +11,11 @@ import {
   Calculator,
   Bot,
   Users,
-  Sun,
-  Moon,
   Menu,
   X,
   Zap,
   Orbit,
 } from 'lucide-react';
-import { useTheme } from '@/providers/ThemeProvider';
 
 const navLinks = [
   { href: '/learn', label: 'Learn', icon: BookOpen },
@@ -30,7 +27,6 @@ const navLinks = [
 ];
 
 export default function Navbar() {
-  const { theme, toggleTheme } = useTheme();
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -105,27 +101,6 @@ export default function Navbar() {
 
             {/* Right side actions */}
             <div className="flex items-center gap-2">
-              {/* Theme toggle */}
-              <button
-                onClick={toggleTheme}
-                id="theme-toggle"
-                className="flex items-center justify-center w-9 h-9 rounded-xl transition-all duration-200 hover:bg-[var(--bg-tertiary)]"
-                style={{ color: 'var(--text-muted)' }}
-                aria-label="Toggle theme"
-              >
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={theme}
-                    initial={{ rotate: -90, opacity: 0 }}
-                    animate={{ rotate: 0, opacity: 1 }}
-                    exit={{ rotate: 90, opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-                  </motion.div>
-                </AnimatePresence>
-              </button>
-
               {/* Sign In */}
               <Link
                 href="/auth"

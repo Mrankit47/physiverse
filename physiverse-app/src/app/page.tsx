@@ -153,7 +153,7 @@ export default function HomePage() {
             transition={{ duration: 1, delay: 0.3 }}
           >
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium mb-6"
-              style={{ background: 'rgba(255, 122, 0, 0.15)', color: '#FF9E40', border: '1px solid rgba(255, 122, 0, 0.3)' }}>
+              style={{ background: 'rgba(255, 122, 0, 0.12)', color: 'var(--color-primary-dark)', border: '1px solid rgba(255, 122, 0, 0.25)' }}>
               <Sparkles className="w-4 h-4" />
               The Future of Physics Education
             </div>
@@ -163,8 +163,8 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.5 }}
-            className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-6 leading-tight"
-            style={{ fontFamily: 'var(--font-heading)', letterSpacing: '-0.03em' }}
+            className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight"
+            style={{ fontFamily: 'var(--font-heading)', letterSpacing: '-0.03em', color: 'var(--text-heading)' }}
           >
             Explore the
             <br />
@@ -176,7 +176,7 @@ export default function HomePage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.7 }}
             className="text-lg md:text-xl max-w-2xl mx-auto mb-10 text-center"
-            style={{ color: 'rgba(255,255,255,0.7)' }}
+            style={{ color: 'var(--text-body)' }}
           >
             Immersive 3D simulations, interactive formula explorers, and AI-powered tutoring.
             Physics has never been this tangible.
@@ -201,8 +201,8 @@ export default function HomePage() {
             <Link
               href="/learn"
               id="hero-learn-cta"
-              className="flex items-center gap-2 px-8 py-4 rounded-2xl text-base font-semibold transition-all"
-              style={{ color: 'rgba(255,255,255,0.9)', border: '1px solid rgba(255,255,255,0.2)', background: 'rgba(255,255,255,0.05)' }}
+              className="flex items-center gap-2 px-8 py-4 rounded-2xl text-base font-semibold transition-all hover:bg-[var(--bg-tertiary)] hover:shadow-md"
+              style={{ color: 'var(--text-heading)', border: '1px solid var(--border-default)', background: 'var(--bg-secondary)' }}
             >
               <GraduationCap className="w-5 h-5" />
               Start Learning
@@ -219,7 +219,7 @@ export default function HomePage() {
             {stats.map((stat) => (
               <div key={stat.label} className="text-center">
                 <div className="text-2xl md:text-3xl font-bold gradient-text">{stat.value}</div>
-                <div className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                <div className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
                   {stat.label}
                 </div>
               </div>
@@ -234,12 +234,12 @@ export default function HomePage() {
           transition={{ delay: 2 }}
           className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
         >
-          <span className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>Scroll to explore</span>
+          <span className="text-xs" style={{ color: 'var(--text-muted)' }}>Scroll to explore</span>
           <motion.div
             animate={{ y: [0, 8, 0] }}
             transition={{ duration: 1.5, repeat: Infinity }}
           >
-            <ChevronDown className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.4)' }} />
+            <ChevronDown className="w-5 h-5" style={{ color: 'var(--text-muted)' }} />
           </motion.div>
         </motion.div>
       </section>

@@ -2,273 +2,322 @@
 
 import { useRef, Suspense, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Stars, OrbitControls } from '@react-three/drei';
+import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 
-/* ── Spacetime Height Calculation ── */
-function getSpacetimeHeight(
+/* ── Quantum Wave Function Height Calculation ── */
+function getQuantumHeight(
   x: number,
   z: number,
   time: number,
   mouse: THREE.Vector2,
-  mass1Pos: THREE.Vector3,
-  mass2Pos: THREE.Vector3
+  node1: THREE.Vector3,
+  node2: THREE.Vector3
 ) {
-  // 1. Center mass (singularity) - static at (0, 0)
-  const distCenter = Math.sqrt(x * x + z * z);
-  const warpCenter = -1.2 / (distCenter * 0.45 + 0.65);
+  // 1. Distance to Emitter Nodes
+  const d1 = Math.sqrt((x - node1.x) ** 2 + (z - node1.z) ** 2);
+  const d2 = Math.sqrt((x - node2.x) ** 2 + (z - node2.z) ** 2);
 
-  // 2. Mass 1 (inner blue orbiter)
-  const distMass1 = Math.sqrt((x - mass1Pos.x) ** 2 + (z - mass1Pos.z) ** 2);
-  const warpMass1 = -0.65 / (distMass1 * 0.7 + 0.45);
+  // 2. Oscillating Spherical Waves (propagating probability waves)
+  const w1 = Math.cos(d1 * 2.3 - time * 3.5) * Math.exp(-d1 * 0.16);
+  const w2 = Math.cos(d2 * 2.3 - time * 3.5) * Math.exp(-d2 * 0.16);
 
-  // 3. Mass 2 (outer green orbiter)
-  const distMass2 = Math.sqrt((x - mass2Pos.x) ** 2 + (z - mass2Pos.z) ** 2);
-  const warpMass2 = -0.35 / (distMass2 * 0.75 + 0.5);
+  // 3. Superposition & Interference Fringes
+  const waveInterference = 0.65 * (w1 + w2);
 
-  // 4. Mouse gravity well (only active when hovered)
-  let warpMouse = 0;
+  // 4. Mouse Measurement Probe Well (collapses/bends grid locally)
+  let probeWell = 0;
   if (mouse.x < 500) {
-    const distMouse = Math.sqrt((x - mouse.x) ** 2 + (z - mouse.y) ** 2);
-    const mouseInfluence = Math.max(0, 1 - distMouse / 5.5);
-    warpMouse = -1.3 * mouseInfluence / (distMouse * 0.55 + 0.45);
+    const dm = Math.sqrt((x - mouse.x) ** 2 + (z - mouse.y) ** 2);
+    const influence = Math.max(0, 1 - dm / 5.5);
+    probeWell = -1.4 * influence / (dm * 0.55 + 0.45);
   }
 
-  // 5. Gravitational ripples from center
-  const waveCenter = Math.sin(distCenter * 2.2 - time * 3.8) * 0.12 * Math.exp(-distCenter * 0.18);
-
-  // 6. Ripples from orbiting Mass 1
-  const waveMass1 = Math.sin(distMass1 * 2.8 - time * 4.6) * 0.06 * Math.exp(-distMass1 * 0.35);
-
-  return warpCenter + warpMass1 + warpMass2 + warpMouse + waveCenter + waveMass1;
+  return waveInterference + probeWell;
 }
 
-/* ── Spacetime Grid Component ── */
-function SpacetimeGrid({
-  mouseWorldPos,
-  mass1Pos,
-  mass2Pos,
-}: {
-  mouseWorldPos: React.MutableRefObject<THREE.Vector2>;
-  mass1Pos: THREE.Vector3;
-  mass2Pos: THREE.Vector3;
-}) {
-  const geometryRef = useRef<THREE.BufferGeometry>(null!);
+/* ── Scene Components & Unified Physics Loop ── */
+function SceneContent() {
+  // References
+  const gridGeometryRef = useRef<THREE.BufferGeometry>(null!);
+  const pointsRef = useRef<THREE.Points>(null!);
   
-  // Grid properties
-  const width = 16;
-  const height = 16;
+  const node1MeshRef = useRef<THREE.Mesh>(null!);
+  const node2MeshRef = useRef<THREE.Mesh>(null!);
+  const mouseMeshRef = useRef<THREE.Mesh>(null!);
+
+  // Physics States
+  const node1Pos = useMemo(() => new THREE.Vector3(), []);
+  const node2Pos = useMemo(() => new THREE.Vector3(), []);
+  const mouseWorldPos = useRef(new THREE.Vector2(999, 999));
+
+  // Mouse Raycasting Plane
+  const raycastPlane = useMemo(() => new THREE.Plane(new THREE.Vector3(0, 1, 0), 0.5), []);
+  const intersectionPoint = useMemo(() => new THREE.Vector3(), []);
+
+  // Grid Dimensions & Resolution
+  const gridWidth = 16;
+  const gridHeight = 16;
   const segments = 45; // 46 x 46 = 2116 vertices
   
+  // Cache initial flat X/Y coordinates
   const initialCoords = useRef<{ x: number; y: number }[]>([]);
 
-  // Pre-initialize colors array to feed WebGL buffer attribute
-  const colors = useMemo(() => {
+  // Pre-initialize grid colors buffer
+  const gridColors = useMemo(() => {
     const count = (segments + 1) * (segments + 1);
     return new Float32Array(count * 3);
   }, [segments]);
 
-  useFrame((state) => {
-    if (!geometryRef.current) return;
-    const time = state.clock.getElapsedTime();
-    const posAttr = geometryRef.current.attributes.position;
-    const colorAttr = geometryRef.current.attributes.color;
-
-    // Cache local flat coordinate positions on first run
-    if (initialCoords.current.length === 0) {
-      for (let i = 0; i < posAttr.count; i++) {
-        initialCoords.current.push({ x: posAttr.getX(i), y: posAttr.getY(i) });
-      }
+  // Particle Swarm Setup (1000 quantum dust particles)
+  const particleCount = 1000;
+  const particlePositions = useMemo(() => new Float32Array(particleCount * 3), []);
+  const particleData = useMemo(() => {
+    const data = [];
+    for (let i = 0; i < particleCount; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const r = 0.5 + Math.random() * 6.5;
+      data.push({
+        x: Math.cos(angle) * r,
+        z: Math.sin(angle) * r,
+        y: 0,
+        speed: 0.02 + Math.random() * 0.025,
+        angle: angle,
+        emitterId: Math.random() > 0.5 ? 1 : 2,
+        life: Math.random(),
+      });
     }
+    return data;
+  }, []);
 
-    const coords = initialCoords.current;
-    for (let i = 0; i < coords.length; i++) {
-      const { x, y } = coords[i];
-      
-      // Local plane geometry coordinates are X and Y, representing world space X and Z
-      const zVal = getSpacetimeHeight(x, y, time, mouseWorldPos.current, mass1Pos, mass2Pos);
-      posAttr.setZ(i, zVal);
-
-      // Gradient color mapping based on local deformation (depth)
-      const depth = -zVal;
-      let r = 0.05, g = 0.1, b = 0.35; // Deep indigo baseline
-
-      if (depth < 0.8) {
-        const t = depth / 0.8;
-        r = 0.05 + t * 0.45; // Transitions towards purple
-        g = 0.1 - t * 0.05;
-        b = 0.35 + t * 0.35;
-      } else {
-        const t = Math.min((depth - 0.8) / 1.5, 1.0);
-        r = 0.5 + t * 0.5;   // Transitions towards bright orange/red energy glow
-        g = 0.05 + t * 0.43;
-        b = 0.7 - t * 0.7;
-      }
-      colorAttr.setXYZ(i, r, g, b);
+  // Circular texture suited for light background (indigo/slate translucent orbs)
+  const particleTexture = useMemo(() => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 16;
+    canvas.height = 16;
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      const gradient = ctx.createRadialGradient(8, 8, 0, 8, 8, 8);
+      gradient.addColorStop(0, 'rgba(30, 41, 59, 1)');      // Dark slate core
+      gradient.addColorStop(0.4, 'rgba(79, 70, 229, 0.75)'); // Indigo glow
+      gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, 16, 16);
     }
-    
-    posAttr.needsUpdate = true;
-    colorAttr.needsUpdate = true;
-  });
+    return new THREE.CanvasTexture(canvas);
+  }, []);
 
-  return (
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.5, 0]}>
-      <planeGeometry ref={geometryRef} args={[width, height, segments, segments]}>
-        <bufferAttribute
-          attach="attributes-color"
-          args={[colors, 3]}
-        />
-      </planeGeometry>
-      <meshBasicMaterial vertexColors wireframe transparent opacity={0.6} />
-    </mesh>
-  );
-}
-
-/* ── Scene Components & Loop Handler ── */
-function SceneContent() {
-  const accretionDiskRef = useRef<THREE.Mesh>(null!);
-  const singularityRef = useRef<THREE.Group>(null!);
-  const orbiter1Ref = useRef<THREE.Group>(null!);
-  const orbiter2Ref = useRef<THREE.Group>(null!);
-
-  const mass1Pos = useMemo(() => new THREE.Vector3(), []);
-  const mass2Pos = useMemo(() => new THREE.Vector3(), []);
-  const mouseWorldPos = useRef(new THREE.Vector2(999, 999));
-
-  // Virtual plane at Y = -0.5 used to project pointer coordinates into 3D space
-  const raycastPlane = useMemo(() => new THREE.Plane(new THREE.Vector3(0, 1, 0), 0.5), []);
-  const intersectionPoint = useMemo(() => new THREE.Vector3(), []);
-
+  // Unified Frame update loop running at 60fps
   useFrame((state) => {
     const time = state.clock.getElapsedTime();
 
-    // 1. Translate screen pointer into world coordinates on the grid plane
+    // 1. Raycast cursor coordinates onto virtual flat floor plane (Y = -0.5)
     const { raycaster, pointer, camera } = state;
     raycaster.setFromCamera(pointer, camera);
     const intersects = raycaster.ray.intersectPlane(raycastPlane, intersectionPoint);
     
     if (intersects) {
-      // Lerp mouse positions to create a smooth, viscous trailing well
       if (mouseWorldPos.current.x > 500) {
         mouseWorldPos.current.set(intersectionPoint.x, intersectionPoint.z);
       } else {
-        mouseWorldPos.current.x += (intersectionPoint.x - mouseWorldPos.current.x) * 0.15;
-        mouseWorldPos.current.y += (intersectionPoint.z - mouseWorldPos.current.y) * 0.15;
+        // Smooth lerp to trailing mouse well
+        mouseWorldPos.current.x += (intersectionPoint.x - mouseWorldPos.current.x) * 0.16;
+        mouseWorldPos.current.y += (intersectionPoint.z - mouseWorldPos.current.y) * 0.16;
       }
     } else {
-      // Send well far away if cursor leaves canvas plane
       mouseWorldPos.current.set(999, 999);
     }
 
-    // 2. Animate Inner Orbiter (Blue Singularity)
-    const radius1 = 2.4;
-    const speed1 = 0.65;
-    const angle1 = time * speed1;
-    mass1Pos.x = Math.cos(angle1) * radius1;
-    mass1Pos.z = Math.sin(angle1) * radius1;
-    // Align orbiter Y coordinate perfectly with the warped grid depth
-    mass1Pos.y = getSpacetimeHeight(mass1Pos.x, mass1Pos.z, time, mouseWorldPos.current, mass1Pos, mass2Pos) - 0.5;
+    // 2. Update Spinning Emitter Nodes positions
+    const orbRadius = 1.8;
+    const orbSpeed = 0.35;
+    const orbAngle = time * orbSpeed;
     
-    if (orbiter1Ref.current) {
-      orbiter1Ref.current.position.copy(mass1Pos);
+    node1Pos.set(
+      -orbRadius * Math.cos(orbAngle),
+      getQuantumHeight(-orbRadius * Math.cos(orbAngle), -orbRadius * Math.sin(orbAngle), time, mouseWorldPos.current, node1Pos, node2Pos) - 0.5,
+      -orbRadius * Math.sin(orbAngle)
+    );
+    
+    node2Pos.set(
+      orbRadius * Math.cos(orbAngle),
+      getQuantumHeight(orbRadius * Math.cos(orbAngle), orbRadius * Math.sin(orbAngle), time, mouseWorldPos.current, node1Pos, node2Pos) - 0.5,
+      orbRadius * Math.sin(orbAngle)
+    );
+
+    if (node1MeshRef.current) node1MeshRef.current.position.copy(node1Pos);
+    if (node2MeshRef.current) node2MeshRef.current.position.copy(node2Pos);
+
+    // 3. Position Mouse measurement probe (collapses to Y grid height or hides)
+    if (mouseMeshRef.current) {
+      if (mouseWorldPos.current.x < 500) {
+        const mouseHeight = getQuantumHeight(mouseWorldPos.current.x, mouseWorldPos.current.y, time, mouseWorldPos.current, node1Pos, node2Pos) - 0.5;
+        mouseMeshRef.current.position.set(mouseWorldPos.current.x, mouseHeight, mouseWorldPos.current.y);
+        mouseMeshRef.current.scale.set(1, 1, 1);
+      } else {
+        mouseMeshRef.current.scale.set(0, 0, 0); // Hide
+      }
     }
 
-    // 3. Animate Outer Orbiter (Green Singularity)
-    const radius2 = 3.8;
-    const speed2 = -0.4;
-    const angle2 = time * speed2;
-    mass2Pos.x = Math.cos(angle2) * radius2;
-    mass2Pos.z = Math.sin(angle2) * radius2;
-    // Align orbiter Y coordinate perfectly with the warped grid depth
-    mass2Pos.y = getSpacetimeHeight(mass2Pos.x, mass2Pos.z, time, mouseWorldPos.current, mass1Pos, mass2Pos) - 0.5;
+    // 4. Update Spacetime Grid Vertices & Vertex Colors
+    if (gridGeometryRef.current) {
+      const posAttr = gridGeometryRef.current.attributes.position;
+      const colorAttr = gridGeometryRef.current.attributes.color;
 
-    if (orbiter2Ref.current) {
-      orbiter2Ref.current.position.copy(mass2Pos);
+      // Cache coordinate references on first frame
+      if (initialCoords.current.length === 0) {
+        for (let i = 0; i < posAttr.count; i++) {
+          initialCoords.current.push({ x: posAttr.getX(i), y: posAttr.getY(i) });
+        }
+      }
+
+      const coords = initialCoords.current;
+      for (let i = 0; i < coords.length; i++) {
+        const { x, y } = coords[i]; // Local X/Y represent world space X/Z
+        const zVal = getQuantumHeight(x, y, time, mouseWorldPos.current, node1Pos, node2Pos);
+        posAttr.setZ(i, zVal);
+
+        // Color mapping suited for white background (Default: light slate-blue lines)
+        let r = 0.65, g = 0.72, b = 0.8; // subtle slate blue/grey
+
+        if (zVal < -0.8) {
+          // Intense measurement collapse well (Mouse well) - deep orange/red
+          const t = Math.min((-zVal - 0.8) / 1.2, 1.0);
+          r = 0.65 + t * (0.9 - 0.65);
+          g = 0.72 - t * (0.72 - 0.35);
+          b = 0.8 - t * (0.8 - 0.0);
+        } else if (zVal > 0) {
+          // Constructive interference peaks (cyan left, magenta right - darkened to show on white)
+          const t = Math.min(zVal / 0.7, 1.0);
+          const mixFactor = Math.sin(x * 0.25) * 0.5 + 0.5; // X-based spatial blend
+          const peakR = mixFactor * 0.75 + (1 - mixFactor) * 0.0;
+          const peakG = mixFactor * 0.1 + (1 - mixFactor) * 0.55;
+          const peakB = mixFactor * 0.5 + (1 - mixFactor) * 0.7;
+          r = 0.65 + t * (peakR - 0.65);
+          g = 0.72 + t * (peakG - 0.72);
+          b = 0.8 + t * (peakB - 0.8);
+        } else {
+          // Destructive interference troughs (medium royal violet/blue)
+          const t = Math.min(-zVal / 0.8, 1.0);
+          r = 0.65 - t * 0.25;
+          g = 0.72 - t * 0.35;
+          b = 0.8 - t * 0.15;
+        }
+
+        colorAttr.setXYZ(i, r, g, b);
+      }
+      posAttr.needsUpdate = true;
+      colorAttr.needsUpdate = true;
     }
 
-    // 4. Update Central Singularity position (height drops slightly as orbital gravity oscillates)
-    const centerY = getSpacetimeHeight(0, 0, time, mouseWorldPos.current, mass1Pos, mass2Pos) - 0.5;
-    if (singularityRef.current) {
-      singularityRef.current.position.set(0, centerY, 0);
-    }
+    // 5. Update Quantum Swarm (Particles guided by Emitters and Mouse)
+    if (pointsRef.current) {
+      const pointsGeom = pointsRef.current.geometry;
+      const ptsAttr = pointsGeom.attributes.position;
 
-    // Rotate the black hole accretion disk
-    if (accretionDiskRef.current) {
-      accretionDiskRef.current.rotation.z = time * 0.35;
+      for (let i = 0; i < particleCount; i++) {
+        const p = particleData[i];
+        const emitter = p.emitterId === 1 ? node1Pos : node2Pos;
+
+        // Advance orbit angle
+        p.angle += p.speed * 0.45;
+
+        // Flow outwards from emitters in spiral orbits
+        const radius = 1.0 + p.life * 6.0;
+        const targetX = emitter.x + Math.cos(p.angle) * radius;
+        const targetZ = emitter.z + Math.sin(p.angle) * radius;
+
+        // Move towards target spiral path
+        p.x += (targetX - p.x) * 0.04;
+        p.z += (targetZ - p.z) * 0.04;
+
+        // Cursor attraction & swirling cyclone effect
+        if (mouseWorldPos.current.x < 500) {
+          const dx = mouseWorldPos.current.x - p.x;
+          const dz = mouseWorldPos.current.y - p.z;
+          const distToMouse = Math.sqrt(dx * dx + dz * dz);
+          
+          if (distToMouse < 4.0) {
+            const pull = (1.0 - distToMouse / 4.0) * 0.12;
+            p.x += dx * pull;
+            p.z += dz * pull;
+            // Cyclonic orbit around cursor
+            p.x -= dz * pull * 0.6;
+            p.z += dx * pull * 0.6;
+          }
+        }
+
+        // Advance particle life cycle
+        p.life += p.speed * 0.15;
+        if (p.life > 1.0) {
+          p.life = 0;
+          p.angle = Math.random() * Math.PI * 2;
+          p.x = emitter.x + Math.cos(p.angle) * 0.15;
+          p.z = emitter.z + Math.sin(p.angle) * 0.15;
+        }
+
+        // Align particles precisely to ride the waves (with minor float elevation offset)
+        p.y = getQuantumHeight(p.x, p.z, time, mouseWorldPos.current, node1Pos, node2Pos) - 0.5 + 0.04;
+
+        ptsAttr.setXYZ(i, p.x, p.y, p.z);
+      }
+      ptsAttr.needsUpdate = true;
     }
   });
 
   return (
     <>
-      <ambientLight intensity={0.25} />
-      
-      {/* Central Gravitational Singularity (Black Hole) */}
-      <group ref={singularityRef}>
-        {/* Core Event Horizon */}
-        <mesh>
-          <sphereGeometry args={[0.55, 32, 32]} />
-          <meshBasicMaterial color="#000000" />
-        </mesh>
-        
-        {/* Glowing Lensing/Energy Envelope */}
-        <mesh>
-          <sphereGeometry args={[0.62, 32, 32]} />
-          <meshStandardMaterial
-            color="#FF7A00"
-            emissive="#FF4500"
-            emissiveIntensity={2.5}
-            transparent
-            opacity={0.55}
+      {/* Higher ambient light for light background clarity */}
+      <ambientLight intensity={0.55} />
+
+      {/* Node 1: Glowing Cyan Quantum Emitter */}
+      <mesh ref={node1MeshRef}>
+        <sphereGeometry args={[0.15, 16, 16]} />
+        <meshBasicMaterial color="#0284C7" />
+        <pointLight color="#0284C7" intensity={2.0} distance={5} decay={1.8} />
+      </mesh>
+
+      {/* Node 2: Glowing Magenta/Rose Quantum Emitter */}
+      <mesh ref={node2MeshRef}>
+        <sphereGeometry args={[0.15, 16, 16]} />
+        <meshBasicMaterial color="#DB2777" />
+        <pointLight color="#DB2777" intensity={2.0} distance={5} decay={1.8} />
+      </mesh>
+
+      {/* Mouse Probe: Glowing Slate Particle Detector */}
+      <mesh ref={mouseMeshRef}>
+        <sphereGeometry args={[0.08, 16, 16]} />
+        <meshBasicMaterial color="#1E293B" />
+        <pointLight color="#4F46E5" intensity={1.8} distance={4} decay={1.8} />
+      </mesh>
+
+      {/* Quantum Dust Particle Swarm */}
+      <points ref={pointsRef}>
+        <bufferGeometry>
+          <bufferAttribute
+            attach="attributes-position"
+            args={[particlePositions, 3]}
           />
-        </mesh>
+        </bufferGeometry>
+        <pointsMaterial
+          size={0.09}
+          map={particleTexture}
+          transparent
+          opacity={0.8}
+          sizeAttenuation
+        />
+      </points>
 
-        {/* Accretion Disk */}
-        <mesh ref={accretionDiskRef} rotation={[Math.PI / 2, 0, 0]}>
-          <ringGeometry args={[0.75, 1.8, 64]} />
-          <meshStandardMaterial
-            color="#FF3C00"
-            emissive="#FF6000"
-            emissiveIntensity={1.8}
-            side={THREE.DoubleSide}
-            transparent
-            opacity={0.8}
+      {/* Undulating Quantum Field Grid */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.5, 0]}>
+        <planeGeometry ref={gridGeometryRef} args={[gridWidth, gridHeight, segments, segments]}>
+          <bufferAttribute
+            attach="attributes-color"
+            args={[gridColors, 3]}
           />
-        </mesh>
-        
-        <pointLight intensity={3.5} color="#FF7A00" distance={10} decay={1.5} />
-      </group>
-
-      {/* Blue Orbiting Mass */}
-      <group ref={orbiter1Ref}>
-        <mesh>
-          <sphereGeometry args={[0.13, 16, 16]} />
-          <meshStandardMaterial color="#3B82F6" emissive="#3B82F6" emissiveIntensity={2.0} />
-        </mesh>
-        <pointLight color="#3B82F6" intensity={2.0} distance={4.5} decay={2.0} />
-      </group>
-
-      {/* Green Orbiting Mass */}
-      <group ref={orbiter2Ref}>
-        <mesh>
-          <sphereGeometry args={[0.09, 16, 16]} />
-          <meshStandardMaterial color="#10B981" emissive="#10B981" emissiveIntensity={1.8} />
-        </mesh>
-        <pointLight color="#10B981" intensity={1.5} distance={3.5} decay={2.0} />
-      </group>
-
-      {/* Ambient Cosmos Stars */}
-      <Stars
-        radius={45}
-        depth={60}
-        count={2500}
-        factor={3.5}
-        saturation={0.6}
-        fade
-        speed={0.4}
-      />
-
-      {/* The Dynamic Spacetime Fabric */}
-      <SpacetimeGrid mouseWorldPos={mouseWorldPos} mass1Pos={mass1Pos} mass2Pos={mass2Pos} />
+        </planeGeometry>
+        <meshBasicMaterial vertexColors wireframe transparent opacity={0.45} />
+      </mesh>
     </>
   );
 }
@@ -278,7 +327,7 @@ export default function HeroScene() {
   return (
     <div className="absolute inset-0 w-full h-full">
       <Canvas
-        camera={{ position: [0, 6, 8], fov: 55 }}
+        camera={{ position: [0, 5.5, 7.5], fov: 55 }}
         gl={{ antialias: true, alpha: true }}
         style={{ background: 'transparent' }}
       >
@@ -289,9 +338,9 @@ export default function HeroScene() {
             enableZoom={false}
             enablePan={false}
             autoRotate
-            autoRotateSpeed={0.2}
+            autoRotateSpeed={0.15}
             maxPolarAngle={Math.PI / 2.1}
-            minPolarAngle={Math.PI / 3.5}
+            minPolarAngle={Math.PI / 3.2}
           />
         </Suspense>
       </Canvas>

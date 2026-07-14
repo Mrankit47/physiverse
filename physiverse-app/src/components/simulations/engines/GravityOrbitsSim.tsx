@@ -47,13 +47,13 @@ function GravityScene({ mass1, mass2, distance }: { mass1: number; mass2: number
         <Body position={pos2} size={Math.cbrt(mass2) * 0.15} color="#EF4444" />
 
         {/* Force vectors */}
-        <ForceArrow from={v1} to={v2} color="#FF7A00" />
-        <ForceArrow from={v2} to={v1} color="#FF7A00" />
+        <ForceArrow from={v1} to={v2} color="#FF5500" />
+        <ForceArrow from={v2} to={v1} color="#FF5500" />
 
         {/* Distance line */}
         <Line points={[pos1, pos2]} color="#ffffff" lineWidth={1} dashed dashSize={0.1} gapSize={0.1} />
 
-        <Text position={[0, -1.5, 0]} fontSize={0.25} color="#FF7A00" anchorX="center">
+        <Text position={[0, -1.5, 0]} fontSize={0.25} color="#FF5500" anchorX="center">
           {`F = ${force.toFixed(1)} N`}
         </Text>
 
@@ -89,7 +89,7 @@ export default function GravityOrbitsSim() {
       }
       observations={
         <div className="space-y-3">
-          <div className="p-3 rounded-xl text-center" style={{ background: 'rgba(255, 122, 0, 0.1)' }}>
+          <div className="p-3 rounded-xl text-center" style={{ background: 'rgba(255, 85, 0, 0.1)' }}>
             <div className="text-xs" style={{ color: 'var(--text-muted)' }}>Gravitational Force</div>
             <div className="text-xl font-bold font-mono gradient-text">{force.toFixed(2)} N</div>
           </div>

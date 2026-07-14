@@ -4,6 +4,8 @@ import "./globals.css";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import CustomCursor from "@/components/CustomCursor";
+import PageLoader from "@/components/PageLoader";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -58,6 +60,8 @@ export default function RootLayout({
     >
       <body>
         <ThemeProvider>
+          <PageLoader />
+          <CustomCursor />
           <Navbar />
           <main className="min-h-screen">{children}</main>
           <Footer />

@@ -48,7 +48,7 @@ function ExplodedLighting({ boost }: { boost: number }) {
       <pointLight
         position={[0, 0, 0]}
         intensity={isExploded ? 1.5 : 0.5}
-        color="#FF7A00"
+        color="#FF5500"
         distance={20}
       />
     </>

@@ -15,45 +15,131 @@ Guidelines:
 - If a question is unclear, ask for clarification
 - Format responses with clear headers, bullet points, and numbered steps`;
 
+async function callGroq(messages: { role: string; content: string }[]) {
+  const groqApiKey = process.env.GROQ_API_KEY;
+  if (!groqApiKey) {
+    throw new Error('GROQ_API_KEY is not configured');
+  }
+
+  const groqMessages = [
+    { role: 'system', content: SYSTEM_PROMPT },
+    ...messages.map((m) => ({
+      role: m.role === 'user' ? 'user' : 'assistant',
+      content: m.content,
+    })),
+  ];
+
+  const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${groqApiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'llama-3.3-70b-versatile',
+      messages: groqMessages,
+      temperature: 0.7,
+      max_tokens: 1024,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(`Groq API error: ${response.statusText} ${JSON.stringify(errorData)}`);
+  }
+
+  const data = await response.json();
+  return data.choices[0]?.message?.content || '';
+}
+
 export async function POST(request: Request) {
+  let messages: { role: string; content: string }[] = [];
   try {
-    const { messages } = await request.json();
+    const body = await request.json();
+    messages = body.messages || [];
 
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
+      // Fallback: try Groq first if Gemini is not set
+      if (process.env.GROQ_API_KEY) {
+        try {
+          const response = await callGroq(messages);
+          return NextResponse.json({
+            response: response + "\n\n*(Note: Powered by Fallback Groq AI)*",
+          });
+        } catch (groqError) {
+          console.error('Groq fallback failed:', groqError);
+        }
+      }
+
       // Fallback: provide a mock response
       return NextResponse.json({
-        response: getMockResponse(messages[messages.length - 1]?.content || ''),
+        response: getMockResponse(messages[messages.length - 1]?.content || '') + 
+          "\n\n*(Note: Running in offline mock mode. To get dynamic AI responses, please add a valid GEMINI_API_KEY starting with 'AIzaSy' in your `.env.local` file.)*",
       });
     }
 
-    // Use Gemini API
-    const { GoogleGenerativeAI } = await import('@google/generative-ai');
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    // Try Gemini API
+    try {
+      const { GoogleGenerativeAI } = await import('@google/generative-ai');
+      const genAI = new GoogleGenerativeAI(apiKey);
+      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
-    const chat = model.startChat({
-      history: [
-        { role: 'user', parts: [{ text: 'You are an AI physics tutor. Here is your system prompt: ' + SYSTEM_PROMPT }] },
-        { role: 'model', parts: [{ text: 'I understand. I am Physiverse AI Tutor, ready to help with physics concepts, problem solving, quizzes, and study recommendations. How can I help you today?' }] },
-        ...messages.slice(0, -1).map((m: { role: string; content: string }) => ({
-          role: m.role === 'user' ? 'user' : 'model',
-          parts: [{ text: m.content }],
-        })),
-      ],
-    });
+      const chat = model.startChat({
+        history: [
+          { role: 'user', parts: [{ text: 'You are an AI physics tutor. Here is your system prompt: ' + SYSTEM_PROMPT }] },
+          { role: 'model', parts: [{ text: 'I understand. I am Physiverse AI Tutor, ready to help with physics concepts, problem solving, quizzes, and study recommendations. How can I help you today?' }] },
+          ...messages.slice(0, -1).map((m: { role: string; content: string }) => ({
+            role: m.role === 'user' ? 'user' : 'model',
+            parts: [{ text: m.content }],
+          })),
+        ],
+      });
 
-    const result = await chat.sendMessage(messages[messages.length - 1].content);
-    const response = result.response.text();
+      const result = await chat.sendMessage(messages[messages.length - 1].content);
+      const response = result.response.text();
 
-    return NextResponse.json({ response });
-  } catch (error) {
+      return NextResponse.json({ response });
+    } catch (geminiError: unknown) {
+      console.warn('Gemini API failed, attempting Groq fallback...', geminiError);
+
+      if (process.env.GROQ_API_KEY) {
+        try {
+          const response = await callGroq(messages);
+          return NextResponse.json({
+            response: response + "\n\n*(Note: Gemini rate limit exceeded. Automatically switched to fallback Groq AI)*",
+          });
+        } catch (groqError) {
+          console.error('Groq fallback also failed:', groqError);
+        }
+      }
+
+      // Re-throw Gemini error to let the main catch block handle local mock responder
+      throw geminiError;
+    }
+  } catch (error: unknown) {
     console.error('AI Tutor error:', error);
-    return NextResponse.json(
-      { response: 'I encountered an error processing your request. Please try again.' },
-      { status: 500 }
-    );
+    try {
+      const fallbackResponse = getMockResponse(messages[messages.length - 1]?.content || '');
+      
+      const err = error as { status?: number; message?: string } || {};
+      const errStr = String(error).toLowerCase();
+      const isRateLimit = err.status === 429 || (err.message && String(err.message).includes('429')) || errStr.includes('too many requests');
+      
+      const note = isRateLimit 
+        ? "\n\n*(Note: Gemini API Rate Limit reached (429: Too Many Requests). Your API key is valid, but the free-tier quota limit has been exceeded. Please wait 1 minute and try again.)*"
+        : "\n\n*(Note: Running in offline mock mode due to API response error. Your GEMINI_API_KEY inside `.env.local` seems invalid. Please check that it is a valid key starting with 'AIzaSy'.)*";
+
+      return NextResponse.json({
+        response: fallbackResponse + note,
+      });
+    } catch {
+      return NextResponse.json(
+        { response: 'I encountered an error processing your request. Please try again.' },
+        { status: 500 }
+      );
+    }
   }
 }
 

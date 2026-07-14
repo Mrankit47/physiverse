@@ -58,11 +58,11 @@ export default function PendulumSim() {
     ctx.beginPath();
     ctx.arc(bobX, bobY, bobRadius, 0, Math.PI * 2);
     const grad = ctx.createRadialGradient(bobX - 4, bobY - 4, 2, bobX, bobY, bobRadius);
-    grad.addColorStop(0, '#FF9E40');
-    grad.addColorStop(1, '#FF7A00');
+    grad.addColorStop(0, '#FF5500');
+    grad.addColorStop(1, '#FF5500');
     ctx.fillStyle = grad;
     ctx.fill();
-    ctx.shadowColor = '#FF7A00';
+    ctx.shadowColor = '#FF5500';
     ctx.shadowBlur = 15;
     ctx.fill();
     ctx.shadowBlur = 0;

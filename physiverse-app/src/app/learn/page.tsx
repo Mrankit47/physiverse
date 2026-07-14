@@ -115,7 +115,7 @@ export default function LearnPage() {
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-10">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium mb-4"
-            style={{ background: 'rgba(255, 122, 0, 0.1)', color: 'var(--color-primary)' }}>
+            style={{ background: 'rgba(255, 85, 0, 0.1)', color: 'var(--color-primary)' }}>
             <BookOpen className="w-4 h-4" />
             Structured Curriculum
           </div>

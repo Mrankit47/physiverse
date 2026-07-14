@@ -54,7 +54,7 @@ export default function ProjectileMotionSim() {
     }
 
     // Trajectory curve (theoretical, no air)
-    ctx.strokeStyle = 'rgba(255, 122, 0, 0.2)';
+    ctx.strokeStyle = 'rgba(255, 85, 0, 0.2)';
     ctx.lineWidth = 1;
     ctx.setLineDash([5, 5]);
     ctx.beginPath();
@@ -69,9 +69,9 @@ export default function ProjectileMotionSim() {
 
     // Trail (actual)
     if (trailRef.current.length > 1) {
-      ctx.strokeStyle = '#FF7A00';
+      ctx.strokeStyle = '#FF5500';
       ctx.lineWidth = 2.5;
-      ctx.shadowColor = '#FF7A00';
+      ctx.shadowColor = '#FF5500';
       ctx.shadowBlur = 8;
       ctx.beginPath();
       trailRef.current.forEach((p, i) => {
@@ -87,7 +87,7 @@ export default function ProjectileMotionSim() {
       const last = trailRef.current[trailRef.current.length - 1];
       const lx = ox + last.x * scale;
       const ly = oy - last.y * scale;
-      ctx.fillStyle = '#FF7A00';
+      ctx.fillStyle = '#FF5500';
       ctx.beginPath();
       ctx.arc(lx, ly, 6, 0, Math.PI * 2);
       ctx.fill();

@@ -7,15 +7,15 @@
 
 @theme {
   /* ── Primary / Brand ── */
-  --color-primary: #FF7A00;
-  --color-primary-light: #FF9E40;
-  --color-primary-dark: #E06800;
+  --color-primary: #FF5500;
+  --color-primary-light: #FF5500;
+  --color-primary-dark: #CC4400;
   --color-primary-50: #FFF7ED;
   --color-primary-100: #FFEDD5;
   --color-primary-200: #FED7AA;
-  --color-primary-500: #FF7A00;
-  --color-primary-600: #E06800;
-  --color-primary-700: #C05600;
+  --color-primary-500: #FF5500;
+  --color-primary-600: #CC4400;
+  --color-primary-700: #B33B00;
 
   /* ── Blue Accent ── */
   --color-accent: #3B82F6;
@@ -67,6 +67,16 @@
   --animate-orbit: orbit 20s linear infinite;
   --animate-shimmer: shimmer 2s linear infinite;
   --animate-spin-slow: spin 8s linear infinite;
+  --animate-marquee: marquee 35s linear infinite;
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -94,10 +104,10 @@
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
   --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.08);
   --shadow-xl: 0 16px 50px rgba(0, 0, 0, 0.1);
-  --shadow-glow: 0 0 40px rgba(255, 122, 0, 0.15);
+  --shadow-glow: 0 0 40px rgba(255, 85, 0, 0.15);
 
   --gradient-hero: linear-gradient(135deg, #F0F4F8 0%, #FFFFFF 50%, #F7FAFC 100%);
-  --gradient-primary: linear-gradient(135deg, #FF7A00, #FF9E40);
+  --gradient-primary: #FF5500;
   --gradient-accent: linear-gradient(135deg, #3B82F6, #60A5FA);
   --gradient-surface: linear-gradient(180deg, #FAFBFC 0%, #F3F4F6 100%);
 
@@ -125,7 +135,7 @@
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
   --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.5);
   --shadow-xl: 0 16px 50px rgba(0, 0, 0, 0.6);
-  --shadow-glow: 0 0 60px rgba(255, 122, 0, 0.2);
+  --shadow-glow: 0 0 60px rgba(255, 85, 0, 0.2);
 
   --gradient-hero: linear-gradient(135deg, #0B1120 0%, #1a1a3e 50%, #0B1120 100%);
   --gradient-surface: linear-gradient(180deg, #0B1120 0%, #111827 100%);
@@ -228,7 +238,7 @@
 
 /* Glow effects */
 .glow-orange {
-  box-shadow: 0 0 20px rgba(255, 122, 0, 0.3), 0 0 60px rgba(255, 122, 0, 0.1);
+  box-shadow: 0 0 20px rgba(255, 85, 0, 0.3), 0 0 60px rgba(255, 85, 0, 0.1);
 }
 
 .glow-blue {
@@ -239,12 +249,14 @@
 .section-container {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 1.5rem;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
 }
 
 @media (min-width: 768px) {
   .section-container {
-    padding: 0 3rem;
+    padding-left: 3rem;
+    padding-right: 3rem;
   }
 }
 
@@ -269,7 +281,7 @@
 
 /* Selection */
 ::selection {
-  background: rgba(255, 122, 0, 0.2);
+  background: rgba(255, 85, 0, 0.2);
   color: var(--text-heading);
 }
 
@@ -290,8 +302,8 @@
 }
 
 @keyframes glow {
-  from { box-shadow: 0 0 20px rgba(255, 122, 0, 0.2); }
-  to { box-shadow: 0 0 40px rgba(255, 122, 0, 0.4); }
+  from { box-shadow: 0 0 20px rgba(255, 85, 0, 0.2); }
+  to { box-shadow: 0 0 40px rgba(255, 85, 0, 0.4); }
 }
 
 @keyframes slideUp {
@@ -373,7 +385,7 @@ input[type="range"]::-webkit-slider-thumb {
   border-radius: 50%;
   background: var(--color-primary);
   cursor: pointer;
-  box-shadow: 0 0 8px rgba(255, 122, 0, 0.4);
+  box-shadow: 0 0 8px rgba(255, 85, 0, 0.4);
   transition: transform 0.2s;
 }
 
@@ -388,7 +400,7 @@ input[type="range"]::-moz-range-thumb {
   background: var(--color-primary);
   cursor: pointer;
   border: none;
-  box-shadow: 0 0 8px rgba(255, 122, 0, 0.4);
+  box-shadow: 0 0 8px rgba(255, 85, 0, 0.4);
 }
 
 /* KaTeX overrides for theme */
@@ -591,6 +603,69 @@ input[type="range"]::-moz-range-thumb {
     left: 0.75rem;
     right: 0.75rem;
     width: auto;
+  }
+}
+
+/* ── Atom Logo Draw/Erase Animations ── */
+@keyframes draw-erase {
+  0% {
+    stroke-dashoffset: 60;
+  }
+  40% {
+    stroke-dashoffset: 0;
+  }
+  65% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: -60;
+  }
+}
+
+@keyframes nucleus-scale {
+  0%, 15% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  40%, 65% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  90%, 100% {
+    transform: scale(0);
+    opacity: 0;
+  }
+}
+
+.animate-draw-orbit-1 {
+  stroke-dasharray: 60;
+  stroke-dashoffset: 60;
+  animation: draw-erase 3.5s ease-in-out infinite;
+}
+
+.animate-draw-orbit-2 {
+  stroke-dasharray: 60;
+  stroke-dashoffset: 60;
+  animation: draw-erase 3.5s ease-in-out infinite;
+  animation-delay: 0.3s;
+}
+
+.animate-draw-orbit-3 {
+  stroke-dasharray: 60;
+  stroke-dashoffset: 60;
+  animation: draw-erase 3.5s ease-in-out infinite;
+  animation-delay: 0.6s;
+}
+
+.animate-nucleus-pulse {
+  transform-origin: 12px 12px;
+  animation: nucleus-scale 3.5s ease-in-out infinite;
+}
+
+/* ── Custom Cursor System Hide (Desktop only) ── */
+@media (pointer: fine) {
+  body, a, button, [role="button"], input, select, textarea, .cursor-pointer {
+    cursor: none !important;
   }
 }
 

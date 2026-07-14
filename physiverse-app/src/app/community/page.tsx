@@ -116,7 +116,7 @@ export default function CommunityPage() {
                   className={`flex items-center gap-4 px-6 py-4 transition-colors ${isYou ? '' : 'hover:bg-[var(--bg-tertiary)]'}`}
                   style={{
                     borderBottom: '1px solid var(--border-default)',
-                    background: isYou ? 'rgba(255, 122, 0, 0.05)' : undefined,
+                    background: isYou ? 'rgba(255, 85, 0, 0.05)' : undefined,
                   }}
                 >
                   <span className="w-8 text-center text-sm font-bold" style={{ color: medal ? 'var(--text-heading)' : 'var(--text-muted)' }}>

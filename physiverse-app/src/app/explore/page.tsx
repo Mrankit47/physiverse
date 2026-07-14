@@ -138,7 +138,7 @@ export default function ExplorePage() {
           <div
             className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium mb-4"
             style={{
-              background: 'rgba(255, 122, 0, 0.1)',
+              background: 'rgba(255, 85, 0, 0.1)',
               color: 'var(--color-primary)',
             }}
           >

@@ -48,9 +48,9 @@ export default function WaveOnStringSim() {
     const omega = 2 * Math.PI * frequency;
     const t = timeRef.current;
 
-    ctx.strokeStyle = '#FF7A00';
+    ctx.strokeStyle = '#FF5500';
     ctx.lineWidth = 3;
-    ctx.shadowColor = '#FF7A00';
+    ctx.shadowColor = '#FF5500';
     ctx.shadowBlur = 10;
     ctx.beginPath();
 
@@ -153,7 +153,7 @@ export default function WaveOnStringSim() {
       }
       controls={
         <div>
-          <ParamSlider label="Amplitude" value={amplitude} min={5} max={80} step={1} unit="px" color="#FF7A00" onChange={setAmplitude} />
+          <ParamSlider label="Amplitude" value={amplitude} min={5} max={80} step={1} unit="px" color="#FF5500" onChange={setAmplitude} />
           <ParamSlider label="Frequency" value={frequency} min={0.5} max={8} step={0.1} unit="Hz" color="#3B82F6" onChange={setFrequency} />
           <ParamSlider label="Damping" value={damping} min={0} max={0.1} step={0.005} unit="" color="#EF4444" onChange={setDamping} />
           <ParamSlider label="Tension" value={tension} min={1} max={10} step={0.1} unit="N" color="#10B981" onChange={setTension} />

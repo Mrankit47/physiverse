@@ -57,7 +57,7 @@ export default function OpticsRayTracerSim() {
     }
 
     // Focal points
-    ctx.fillStyle = '#FF7A00';
+    ctx.fillStyle = '#FF5500';
     ctx.beginPath(); ctx.arc(lensX + f, cy, 5, 0, Math.PI * 2); ctx.fill();
     ctx.beginPath(); ctx.arc(lensX - f, cy, 5, 0, Math.PI * 2); ctx.fill();
     ctx.fillStyle = '#94A3B8';
@@ -110,7 +110,7 @@ export default function OpticsRayTracerSim() {
     const objTop = cy - objH;
 
     // Ray 1: Parallel to axis → through F'
-    ctx.strokeStyle = 'rgba(255, 122, 0, 0.5)';
+    ctx.strokeStyle = 'rgba(255, 85, 0, 0.5)';
     ctx.lineWidth = 1.5;
     ctx.beginPath();
     ctx.moveTo(objX, objTop);

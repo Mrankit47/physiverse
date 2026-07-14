@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import LogoIcon from './LogoIcon';
 import {
-  Atom,
   Mail,
   BookOpen,
   Orbit,
@@ -14,71 +15,31 @@ import {
 } from 'lucide-react';
 import { GithubIcon, TwitterIcon, YoutubeIcon } from './SocialIcons';
 
-const footerSections = [
-  {
-    title: 'Platform',
-    links: [
-      { label: 'Learn Physics', href: '/learn' },
-      { label: 'Simulations', href: '/simulations' },
-      { label: 'Virtual Labs', href: '/virtual-labs' },
-      { label: 'Formula Explorer', href: '/formula-explorer' },
-      { label: 'AI Tutor', href: '/ai-tutor' },
-    ],
-  },
-  {
-    title: 'Community',
-    links: [
-      { label: 'Discussion Forum', href: '/community' },
-      { label: 'Leaderboard', href: '/community?tab=leaderboard' },
-      { label: 'Study Groups', href: '/community?tab=groups' },
-      { label: 'Contribute', href: '/contribute' },
-    ],
-  },
-  {
-    title: 'Resources',
-    links: [
-      { label: 'Documentation', href: '/docs' },
-      { label: 'API Reference', href: '/docs/api' },
-      { label: 'Changelog', href: '/changelog' },
-      { label: 'Status', href: '/status' },
-    ],
-  },
-  {
-    title: 'Company',
-    links: [
-      { label: 'About Us', href: '/about' },
-      { label: 'Careers', href: '/careers' },
-      { label: 'Privacy Policy', href: '/privacy' },
-      { label: 'Terms of Service', href: '/terms' },
-    ],
-  },
-];
+
 
 const domainIcons = [BookOpen, Orbit, FlaskConical, Calculator, Bot, Users];
 
 export default function Footer() {
+  const pathname = usePathname();
+  if (pathname === '/') return null;
+
   return (
     <footer
       className="relative overflow-hidden"
       style={{
         background: 'var(--bg-secondary)',
-        borderTop: '1px solid var(--border-default)',
+        borderTop: '2px solid var(--color-primary)',
       }}
     >
-      {/* Decorative gradient line at top */}
-      <div
-        className="absolute top-0 left-0 right-0 h-px"
-        style={{ background: 'var(--gradient-primary)' }}
-      />
 
-      <div className="section-container py-16">
+      <div className="section-container" style={{ paddingTop: '100px', paddingBottom: '64px' }}>
         {/* Top area: Brand + Newsletter */}
         <div className="flex flex-col lg:flex-row justify-between gap-10 mb-14">
           {/* Brand */}
           <div className="max-w-md">
             <Link href="/" className="flex items-center gap-2 mb-4 group">
-              <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary-light shadow-md">
-                <Atom className="w-6 h-6 text-white" />
+              <div className="w-12 h-12 flex items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-primary-light shadow-md">
+                <LogoIcon size={30} className="text-white" />
               </div>
               <span
                 className="text-2xl font-bold tracking-tight"
@@ -150,35 +111,7 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Divider */}
-        <div className="h-px mb-10" style={{ background: 'var(--border-default)' }} />
 
-        {/* Link columns */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-14">
-          {footerSections.map((section) => (
-            <div key={section.title}>
-              <h4
-                className="text-sm font-semibold mb-4 uppercase tracking-wider"
-                style={{ color: 'var(--text-heading)', fontFamily: 'var(--font-heading)' }}
-              >
-                {section.title}
-              </h4>
-              <ul className="space-y-2.5">
-                {section.links.map((link) => (
-                  <li key={link.label}>
-                    <Link
-                      href={link.href}
-                      className="text-sm transition-colors duration-200 hover:text-[var(--color-primary)]"
-                      style={{ color: 'var(--text-muted)' }}
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
 
         {/* Bottom bar */}
         <div

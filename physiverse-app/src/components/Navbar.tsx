@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import LogoIcon from './LogoIcon';
 import {
-  Atom,
   BookOpen,
   FlaskConical,
   Calculator,
@@ -58,8 +58,8 @@ export default function Navbar() {
           <nav className="flex items-center justify-between h-16 md:h-18">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2 group" id="nav-logo">
-              <div className="relative w-9 h-9 flex items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary-light shadow-md group-hover:shadow-lg transition-shadow">
-                <Atom className="w-5 h-5 text-white" />
+              <div className="relative w-10 h-10 flex items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary-light shadow-md group-hover:shadow-lg transition-shadow">
+                <LogoIcon size={24} className="text-white" />
                 <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-primary to-primary-light opacity-0 group-hover:opacity-20 blur-xl transition-opacity" />
               </div>
               <span className="text-xl font-bold tracking-tight" style={{ color: 'var(--text-heading)', fontFamily: 'var(--font-heading)' }}>
@@ -176,7 +176,7 @@ export default function Navbar() {
                       }`}
                       style={{
                         color: isActive ? 'var(--color-primary)' : 'var(--text-body)',
-                        background: isActive ? 'rgba(255, 122, 0, 0.1)' : 'transparent',
+                        background: isActive ? 'rgba(255, 85, 0, 0.1)' : 'transparent',
                       }}
                     >
                       <Icon className="w-5 h-5" />

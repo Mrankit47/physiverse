@@ -45,7 +45,7 @@ export default function ElectromagnetismSim() {
         const r = 30 + i * 30;
         const alpha = Math.max(0.1, 1 - i * 0.08);
 
-        ctx.strokeStyle = `rgba(255, 122, 0, ${alpha})`;
+        ctx.strokeStyle = `rgba(255, 85, 0, ${alpha})`;
         ctx.lineWidth = 1.5;
         ctx.beginPath();
         ctx.arc(cx, cy, r, 0, Math.PI * 2);
@@ -62,7 +62,7 @@ export default function ElectromagnetismSim() {
           const dir = current > 0 ? 1 : -1;
           const tangentAngle = angle + (Math.PI / 2) * dir;
 
-          ctx.fillStyle = `rgba(255, 122, 0, ${alpha})`;
+          ctx.fillStyle = `rgba(255, 85, 0, ${alpha})`;
           ctx.save();
           ctx.translate(ax, ay);
           ctx.rotate(tangentAngle);
@@ -112,7 +112,7 @@ export default function ElectromagnetismSim() {
       const numLines = 5;
       for (let i = 0; i < numLines; i++) {
         const y = coilY + (i + 1) * (coilH / (numLines + 1));
-        ctx.strokeStyle = `rgba(255, 122, 0, ${0.6 - i * 0.05})`;
+        ctx.strokeStyle = `rgba(255, 85, 0, ${0.6 - i * 0.05})`;
         ctx.lineWidth = 1.5;
 
         // Inside: straight lines
@@ -124,7 +124,7 @@ export default function ElectromagnetismSim() {
         // Arrows
         const dir = current > 0 ? 1 : -1;
         const arrowX = coilX + coilW / 2 + ((t * 30 * dir) % 40) - 20;
-        ctx.fillStyle = `rgba(255, 122, 0, 0.7)`;
+        ctx.fillStyle = `rgba(255, 85, 0, 0.7)`;
         ctx.save();
         ctx.translate(arrowX, y);
         ctx.rotate(dir > 0 ? 0 : Math.PI);
@@ -138,7 +138,7 @@ export default function ElectromagnetismSim() {
       }
 
       // External field lines (curved, from N to S)
-      ctx.strokeStyle = 'rgba(255, 122, 0, 0.2)';
+      ctx.strokeStyle = 'rgba(255, 85, 0, 0.2)';
       ctx.lineWidth = 1;
       for (let i = 0; i < 3; i++) {
         const spread = 40 + i * 30;

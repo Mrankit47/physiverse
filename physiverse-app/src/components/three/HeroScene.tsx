@@ -4,6 +4,7 @@ import { useRef, Suspense, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
+import HeroAtom from './HeroAtom';
 
 /* ── Quantum Wave Function Height Calculation ── */
 function getQuantumHeight(
@@ -318,6 +319,9 @@ function SceneContent() {
         </planeGeometry>
         <meshBasicMaterial vertexColors wireframe transparent opacity={0.45} />
       </mesh>
+
+      {/* 3D Atom - Floating physics object */}
+      <HeroAtom position={[3.5, 1.2, -1]} />
     </>
   );
 }

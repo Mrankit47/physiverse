@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode, useMemo } from 'react';
+import { ReactNode } from 'react';
 import ComponentMesh from './ComponentMesh';
 import type { ComponentData, Vec3 } from '@/data/explodedView/componentRegistry';
 
@@ -20,20 +20,6 @@ export default function ExplodableObject({
   geometryMap,
 }: ExplodableObjectProps) {
   const totalComponents = components.length;
-
-  /* ── Build a map of component ID → exploded position for camera targeting ── */
-  const componentPositionsMap = useMemo(() => {
-    const map = new Map<string, Vec3>();
-    components.forEach((comp) => {
-      const explodedPos: Vec3 = [
-        comp.assembledPosition[0] + comp.explodedOffset[0],
-        comp.assembledPosition[1] + comp.explodedOffset[1],
-        comp.assembledPosition[2] + comp.explodedOffset[2],
-      ];
-      map.set(comp.id, explodedPos);
-    });
-    return map;
-  }, [components]);
 
   return (
     <group>

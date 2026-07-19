@@ -5,7 +5,7 @@ import { Canvas } from '@react-three/fiber';
 import { Stars, OrbitControls, Html } from '@react-three/drei';
 import { useExplodedViewStore } from '@/stores/explodedViewStore';
 import { useCameraAnimation } from '@/hooks/useCameraAnimation';
-import type { Vec3, ExplodableObjectData } from '@/data/explodedView/componentRegistry';
+import type { ExplodableObjectData } from '@/data/explodedView/componentRegistry';
 import { buildComponentPositionMap } from './ExplodableObject';
 
 /* ── Internal: Camera Controller ── */

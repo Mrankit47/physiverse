@@ -1,7 +1,6 @@
 'use client';
 
 import { ReactNode } from 'react';
-import * as THREE from 'three';
 
 /**
  * Procedural Optical Bench geometry builder.

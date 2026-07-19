@@ -18,7 +18,11 @@ import {
   GraduationCap,
 } from 'lucide-react';
 
-const HeroScene = dynamic(() => import('@/components/three/HeroScene'), {
+import { useState } from 'react';
+import HeroPhysicsHUD from '@/components/three/HeroPhysicsHUD';
+import type { PhysicsMode } from '@/components/three/HeroPhysicsUniverse';
+
+const HeroPhysicsUniverse = dynamic(() => import('@/components/three/HeroPhysicsUniverse'), {
   ssr: false,
   loading: () => (
     <div className="absolute inset-0 starfield" style={{ background: 'var(--gradient-hero)' }} />
@@ -65,6 +69,10 @@ const navLinks = [
 ];
 
 export default function HomePage() {
+  const [physicsMode, setPhysicsMode] = useState<PhysicsMode>('gravity');
+  const [forceStrength, setForceStrength] = useState<number>(1.0);
+  const [particleSpeed, setParticleSpeed] = useState<number>(1.0);
+
   const stats = [
     { value: '10+', label: '3D Simulations' },
     { value: '150+', label: 'Interactive Lessons' },
@@ -82,7 +90,20 @@ export default function HomePage() {
         className="relative min-h-screen flex items-center justify-center overflow-hidden"
         style={{ background: 'var(--gradient-hero)' }}
       >
-        <HeroScene />
+        <HeroPhysicsUniverse
+          mode={physicsMode}
+          forceStrength={forceStrength}
+          particleSpeed={particleSpeed}
+        />
+
+        <HeroPhysicsHUD
+          currentMode={physicsMode}
+          onModeChange={setPhysicsMode}
+          forceStrength={forceStrength}
+          onForceChange={setForceStrength}
+          particleSpeed={particleSpeed}
+          onSpeedChange={setParticleSpeed}
+        />
 
         {/* Content overlay */}
         <div className="relative z-10 section-container text-center">

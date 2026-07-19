@@ -30,7 +30,6 @@ export default function ExplodedViewControls({
   const highContrast = useExplodedViewStore((s) => s.highContrast);
   const toggleExplode = useExplodedViewStore((s) => s.toggleExplode);
   const enterLearningMode = useExplodedViewStore((s) => s.enterLearningMode);
-  const exitLearningMode = useExplodedViewStore((s) => s.exitLearningMode);
   const setReducedMotion = useExplodedViewStore((s) => s.setReducedMotion);
   const setHighContrast = useExplodedViewStore((s) => s.setHighContrast);
 

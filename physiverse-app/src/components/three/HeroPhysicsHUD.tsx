@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { PhysicsMode } from './HeroPhysicsUniverse';
-import { Orbit, Zap, Atom, Waves, Sliders, MousePointerClick } from 'lucide-react';
+import { Orbit, Zap, Atom, Waves, Sliders, MousePointerClick, Flame } from 'lucide-react';
 import { useState } from 'react';
 
 interface HeroPhysicsHUDProps {
@@ -23,6 +23,15 @@ const MODES: {
   color: string;
   hint: string;
 }[] = [
+  {
+    id: 'nuclear',
+    label: 'Nuclear Fission',
+    icon: Flame,
+    formula: '^{235}\\text{U} + n \\rightarrow {^{141}\\text{Ba}} + {^{92}\\text{Kr}} + 3n + 200\\text{MeV}',
+    concept: 'Nuclear Fission Chain Reaction — Incident neutron & cascading fission shockwaves',
+    color: '#EF4444',
+    hint: 'Incident neutron hits U-235 core, ejecting free neutrons & secondary fission cascades',
+  },
   {
     id: 'gravity',
     label: 'Spacetime Gravity',
@@ -70,40 +79,11 @@ export default function HeroPhysicsHUD({
   onSpeedChange,
 }: HeroPhysicsHUDProps) {
   const [showSettings, setShowSettings] = useState(false);
-  const activeInfo = MODES.find((m) => m.id === currentMode) || MODES[0];
 
   return (
-    <div className="absolute inset-0 pointer-events-none z-20 flex flex-col justify-between p-4 sm:p-6 md:p-8">
-      {/* Top Banner Badge: Active Physics Law & Hint */}
-      <div className="flex justify-between items-start w-full">
-        <motion.div
-          key={currentMode}
-          initial={{ opacity: 0, y: -12 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="pointer-events-auto flex items-center gap-3 px-4 py-2.5 rounded-2xl glass border border-[var(--border-default)] shadow-lg backdrop-blur-md max-w-lg"
-        >
-          <div
-            className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-white font-bold text-xs"
-            style={{ background: activeInfo.color }}
-          >
-            <activeInfo.icon className="w-4 h-4" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold uppercase tracking-wider text-[var(--text-heading)]">
-                {activeInfo.label}
-              </span>
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-orange-500/10 text-[var(--color-primary)] font-mono">
-                {activeInfo.formula}
-              </span>
-            </div>
-            <p className="text-xs text-[var(--text-muted)] line-clamp-1 mt-0.5">
-              {activeInfo.hint}
-            </p>
-          </div>
-        </motion.div>
-
-        {/* Quick Settings Toggle Button */}
+    <div className="absolute inset-0 pointer-events-none z-20 flex flex-col justify-between p-4 sm:p-6 md:p-8 pt-20 sm:pt-24 pb-2 sm:pb-4">
+      {/* Top Bar: Quick Settings Toggle Button */}
+      <div className="flex justify-end items-start w-full">
         <button
           onClick={() => setShowSettings(!showSettings)}
           className="pointer-events-auto flex items-center gap-2 px-3.5 py-2.5 rounded-2xl glass hover:bg-[var(--bg-secondary)] border border-[var(--border-default)] text-xs font-semibold text-[var(--text-heading)] transition-all shadow-md"
@@ -173,7 +153,7 @@ export default function HeroPhysicsHUD({
       </AnimatePresence>
 
       {/* Bottom Mode Switcher Bar */}
-      <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full">
+      <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full pb-2 translate-y-1 sm:translate-y-3">
         <div className="pointer-events-auto flex items-center gap-1.5 p-1.5 rounded-2xl glass border border-[var(--border-default)] shadow-xl backdrop-blur-xl max-w-full overflow-x-auto">
           {MODES.map((mode) => {
             const Icon = mode.icon;

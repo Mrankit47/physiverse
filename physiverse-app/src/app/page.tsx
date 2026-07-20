@@ -12,7 +12,6 @@ import {
   Calculator,
   Bot,
   Users,
-  ChevronDown,
   Play,
   Sparkles,
   GraduationCap,
@@ -69,16 +68,9 @@ const navLinks = [
 ];
 
 export default function HomePage() {
-  const [physicsMode, setPhysicsMode] = useState<PhysicsMode>('gravity');
+  const [physicsMode, setPhysicsMode] = useState<PhysicsMode>('nuclear');
   const [forceStrength, setForceStrength] = useState<number>(1.0);
   const [particleSpeed, setParticleSpeed] = useState<number>(1.0);
-
-  const stats = [
-    { value: '10+', label: '3D Simulations' },
-    { value: '150+', label: 'Interactive Lessons' },
-    { value: '7', label: 'Physics Domains' },
-    { value: '∞', label: 'Curiosity Unlocked' },
-  ];
 
   return (
     <>
@@ -123,11 +115,9 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.5 }}
-            className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight"
-            style={{ fontFamily: 'var(--font-heading)', letterSpacing: '-0.03em', color: 'var(--text-heading)' }}
+            className="text-5xl sm:text-7xl md:text-8xl lg:text-[9.5rem] font-black mb-6 leading-none tracking-tight"
+            style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-heading)' }}
           >
-            Explore the
-            <br />
             <span className="gradient-text">Physiverse</span>
           </motion.h1>
 
@@ -151,12 +141,12 @@ export default function HomePage() {
             <Link
               href="/simulations"
               id="hero-explore-cta"
-              className="group flex items-center gap-2 px-8 py-4 rounded-2xl text-base font-semibold text-white transition-all hover:shadow-xl"
-              style={{ background: 'var(--gradient-primary)' }}
+              className="group flex items-center gap-2 px-8 py-4 rounded-2xl text-base font-semibold !text-white transition-all hover:shadow-xl"
+              style={{ background: 'var(--gradient-primary)', color: '#FFFFFF' }}
             >
-              <Play className="w-5 h-5" />
-              Explore Simulations
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              <Play className="w-5 h-5 !text-white" style={{ color: '#FFFFFF' }} />
+              <span className="!text-white" style={{ color: '#FFFFFF' }}>Explore Simulations</span>
+              <ArrowRight className="w-4 h-4 !text-white group-hover:translate-x-1 transition-transform" style={{ color: '#FFFFFF' }} />
             </Link>
             <Link
               href="/learn"
@@ -168,40 +158,7 @@ export default function HomePage() {
               Start Learning
             </Link>
           </motion.div>
-
-          {/* Stats bar */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 1.2 }}
-            className="mt-16 flex flex-wrap items-center justify-center gap-8 md:gap-14"
-          >
-            {stats.map((stat) => (
-              <div key={stat.label} className="text-center">
-                <div className="text-2xl md:text-3xl font-bold gradient-text">{stat.value}</div>
-                <div className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
-                  {stat.label}
-                </div>
-              </div>
-            ))}
-          </motion.div>
         </div>
-
-        {/* Scroll indicator */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 2 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
-        >
-          <span className="text-xs" style={{ color: 'var(--text-muted)' }}>Scroll to explore</span>
-          <motion.div
-            animate={{ y: [0, 8, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-          >
-            <ChevronDown className="w-5 h-5" style={{ color: 'var(--text-muted)' }} />
-          </motion.div>
-        </motion.div>
       </section>
 
       {/* ════════════════════════════════════════════════════

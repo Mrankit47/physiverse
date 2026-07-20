@@ -5,7 +5,7 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Float } from '@react-three/drei';
 import * as THREE from 'three';
 
-export type PhysicsMode = 'gravity' | 'electromagnetism' | 'quantum' | 'waves';
+export type PhysicsMode = 'gravity' | 'electromagnetism' | 'quantum' | 'waves' | 'nuclear';
 
 interface HeroPhysicsUniverseProps {
   mode?: PhysicsMode;
@@ -645,10 +645,497 @@ function WaveOpticsScene({
 }
 
 /* ──────────────────────────────────────────────────────────────────────────────
+   MODE 5: NUCLEAR CHAIN REACTION (Uranium-235 Fission, Daughter Nuclei & Cascade)
+   ────────────────────────────────────────────────────────────────────────────── */
+function NuclearChainReactionScene({
+  forceStrength,
+  particleSpeed,
+}: {
+  forceStrength: number;
+  particleSpeed: number;
+}) {
+  const gridGeomRef = useRef<THREE.BufferGeometry>(null!);
+  const centralCoreRef = useRef<THREE.Group>(null!);
+  const bariumRef = useRef<THREE.Group>(null!);
+  const kryptonRef = useRef<THREE.Group>(null!);
+  const flashLightRef = useRef<THREE.PointLight>(null!);
+  const radiationParticlesRef = useRef<THREE.Points>(null!);
+
+  // Raycasting for interactive neutron trigger
+  const raycastPlane = useMemo(() => new THREE.Plane(new THREE.Vector3(0, 1, 0), 0), []);
+  const intersectPoint = useMemo(() => new THREE.Vector3(), []);
+  const userTrigger = useRef<{ active: boolean; pos: THREE.Vector3 }>({
+    active: false,
+    pos: new THREE.Vector3(),
+  });
+
+  // Fabric Grid parameters
+  const gridWidth = 20;
+  const gridHeight = 20;
+  const segments = 55;
+  const initialPositions = useRef<{ x: number; y: number }[]>([]);
+
+  const gridColors = useMemo(() => {
+    const count = (segments + 1) * (segments + 1);
+    return new Float32Array(count * 3);
+  }, [segments]);
+
+  // Nucleon cluster generator for U-235 core (protons & neutrons)
+  const u235Nucleons = useMemo(() => {
+    const arr = [];
+    const count = 38; // Representing U-235 dense core cluster
+    for (let i = 0; i < count; i++) {
+      const phi = Math.acos(2 * (i / count) - 1);
+      const theta = Math.PI * (1 + Math.sqrt(5)) * i;
+      const r = 0.22 + (Math.random() - 0.5) * 0.05;
+      arr.push({
+        basePos: new THREE.Vector3(
+          r * Math.sin(phi) * Math.cos(theta),
+          r * Math.sin(phi) * Math.sin(theta),
+          r * Math.cos(phi)
+        ),
+        isProton: i % 2 === 0, // Protons (orange-red) vs Neutrons (blue-white)
+        size: 0.085 + Math.random() * 0.02,
+      });
+    }
+    return arr;
+  }, []);
+
+  // Secondary Heavy U-235 Nuclei arranged in a ring surrounding center fabric
+  const secondaryNuclei = useMemo(() => {
+    const list = [];
+    const count = 6;
+    const radius = 4.2;
+    for (let i = 0; i < count; i++) {
+      const angle = (i / count) * Math.PI * 2 + 0.3;
+      list.push({
+        pos: new THREE.Vector3(Math.cos(angle) * radius, -0.4, Math.sin(angle) * radius),
+        fissioned: false,
+        fissionTime: -999,
+        scale: 0.7,
+      });
+    }
+    return list;
+  }, []);
+
+  // Free Neutrons ejected during fission (n0)
+  const freeNeutrons = useRef<
+    { pos: THREE.Vector3; vel: THREE.Vector3; active: boolean; life: number; color: string }[]
+  >([
+    { pos: new THREE.Vector3(-7, 0, 0), vel: new THREE.Vector3(0.08, 0, 0), active: true, life: 0, color: '#00FFFF' },
+    { pos: new THREE.Vector3(0, 0, 0), vel: new THREE.Vector3(0, 0, 0), active: false, life: 0, color: '#FFFFFF' },
+    { pos: new THREE.Vector3(0, 0, 0), vel: new THREE.Vector3(0, 0, 0), active: false, life: 0, color: '#FFFFFF' },
+    { pos: new THREE.Vector3(0, 0, 0), vel: new THREE.Vector3(0, 0, 0), active: false, life: 0, color: '#FFFFFF' },
+    { pos: new THREE.Vector3(0, 0, 0), vel: new THREE.Vector3(0, 0, 0), active: false, life: 0, color: '#FFFFFF' },
+    { pos: new THREE.Vector3(0, 0, 0), vel: new THREE.Vector3(0, 0, 0), active: false, life: 0, color: '#FFFFFF' },
+    { pos: new THREE.Vector3(0, 0, 0), vel: new THREE.Vector3(0, 0, 0), active: false, life: 0, color: '#FFFFFF' },
+    { pos: new THREE.Vector3(0, 0, 0), vel: new THREE.Vector3(0, 0, 0), active: false, life: 0, color: '#FFFFFF' },
+  ]);
+
+  // Radiation Photons / Swarm
+  const radCount = 500;
+  const radPositions = useMemo(() => new Float32Array(radCount * 3), []);
+  const radData = useMemo(() => {
+    const arr = [];
+    for (let i = 0; i < radCount; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const r = 0.5 + Math.random() * 7.5;
+      arr.push({
+        angle,
+        radius: r,
+        speed: 0.03 + Math.random() * 0.04,
+        y: (Math.random() - 0.5) * 1.5,
+      });
+    }
+    return arr;
+  }, [radCount]);
+
+  // Fission Cycle State
+  const fissionCycle = useRef({
+    stage: 0, // 0: INTACT, 1: ABSORBING, 2: SPLITTING, 3: EXPELLED, 4: CASCADE
+    stageStartTime: 0,
+    primaryFissionTime: -999,
+    shockwaves: [] as { x: number; z: number; time: number; energy: number }[],
+  });
+
+  const particleTexture = useMemo(() => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 32;
+    canvas.height = 32;
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      const g = ctx.createRadialGradient(16, 16, 0, 16, 16, 16);
+      g.addColorStop(0, 'rgba(255, 200, 50, 1)');
+      g.addColorStop(0.4, 'rgba(255, 80, 0, 0.8)');
+      g.addColorStop(1, 'rgba(255, 0, 0, 0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, 32, 32);
+    }
+    return new THREE.CanvasTexture(canvas);
+  }, []);
+
+  useFrame((state) => {
+    const time = state.clock.getElapsedTime();
+    const cycle = fissionCycle.current;
+    const { raycaster, pointer, camera } = state;
+
+    // Handle user pointer click raycasting to launch neutrons
+    raycaster.setFromCamera(pointer, camera);
+    if (state.pointer.x !== 0 || state.pointer.y !== 0) {
+      const hit = raycaster.ray.intersectPlane(raycastPlane, intersectPoint);
+      if (hit && userTrigger.current.active) {
+        // Trigger incident neutron towards hit point
+        freeNeutrons.current[0].pos.copy(intersectPoint).add(new THREE.Vector3(-4, 0, -2));
+        freeNeutrons.current[0].vel
+          .copy(intersectPoint)
+          .sub(freeNeutrons.current[0].pos)
+          .normalize()
+          .multiplyScalar(0.12 * particleSpeed);
+        freeNeutrons.current[0].active = true;
+        userTrigger.current.active = false;
+      }
+    }
+
+    // ── FISSION CYCLE LOGIC ──
+    const cycleAge = time - cycle.stageStartTime;
+
+    // Incident neutron movement & collision with U-235 Core
+    const incNeutron = freeNeutrons.current[0];
+    if (incNeutron.active) {
+      incNeutron.pos.add(incNeutron.vel.clone().multiplyScalar(particleSpeed));
+      const distToCenter = incNeutron.pos.distanceTo(new THREE.Vector3(0, 0, 0));
+
+      if (distToCenter < 0.45 && cycle.stage === 0) {
+        // HIT! Initiate U-235 Absorption & Liquid Drop Elongation
+        cycle.stage = 1; // ABSORBING
+        cycle.stageStartTime = time;
+        incNeutron.active = false;
+      }
+
+      if (incNeutron.pos.length() > 10) {
+        // Reset incident neutron if it missed
+        incNeutron.pos.set(-7, 0, 0);
+        incNeutron.vel.set(0.08 * particleSpeed, 0, 0);
+      }
+    }
+
+    if (cycle.stage === 0 && cycleAge > 8.0) {
+      // Auto-retrigger incident neutron every 8s if idle
+      incNeutron.pos.set(-7, 0, 0);
+      incNeutron.vel.set(0.08 * particleSpeed, 0, 0);
+      incNeutron.active = true;
+      cycle.stageStartTime = time;
+    }
+
+    // Stage 1: U-236 Absorption & Oscillation (0.4s)
+    if (cycle.stage === 1 && cycleAge > 0.4) {
+      // Stage 2: VIOLENT FISSION SPLIT
+      cycle.stage = 2; // SPLITTING
+      cycle.stageStartTime = time;
+      cycle.primaryFissionTime = time;
+
+      // Add energy shockwave at center
+      cycle.shockwaves.push({ x: 0, z: 0, time, energy: 2.2 * forceStrength });
+
+      // Eject 3 High-Energy Free Neutrons in 120-degree vectors
+      const angles = [0.2, 2.3, 4.3];
+      for (let i = 1; i <= 3; i++) {
+        const n = freeNeutrons.current[i];
+        n.pos.set(0, 0, 0);
+        const speed = (0.09 + Math.random() * 0.04) * particleSpeed;
+        n.vel.set(Math.cos(angles[i - 1]) * speed, (Math.random() - 0.5) * 0.02, Math.sin(angles[i - 1]) * speed);
+        n.active = true;
+        n.life = 0;
+      }
+    }
+
+    // Stage 2: Recoil Daughter Fragments (Barium-141 & Krypton-92)
+    if (cycle.stage === 2) {
+      const splitTime = time - cycle.primaryFissionTime;
+      const dist = Math.min(splitTime * 1.8 * particleSpeed, 2.2);
+
+      if (bariumRef.current) {
+        bariumRef.current.position.set(-dist * 1.1, Math.sin(splitTime * 3) * 0.1, -dist * 0.6);
+        bariumRef.current.rotation.y = time * 2;
+      }
+      if (kryptonRef.current) {
+        kryptonRef.current.position.set(dist * 1.1, -Math.sin(splitTime * 3) * 0.1, dist * 0.6);
+        kryptonRef.current.rotation.y = -time * 2.5;
+      }
+
+      if (flashLightRef.current) {
+        flashLightRef.current.intensity = Math.max(0, (1.0 - splitTime * 1.5) * 12 * forceStrength);
+      }
+
+      if (splitTime > 1.2) {
+        cycle.stage = 3; // CASCADE STAGE
+      }
+    }
+
+    // Stage 3 & 4: Free Neutrons travel and strike Secondary Nuclei
+    for (let i = 1; i < freeNeutrons.current.length; i++) {
+      const n = freeNeutrons.current[i];
+      if (n.active) {
+        n.pos.add(n.vel.clone().multiplyScalar(particleSpeed));
+        n.life += 0.016;
+
+        // Check collision with secondary U-235 nuclei
+        secondaryNuclei.forEach((sec) => {
+          if (!sec.fissioned && n.pos.distanceTo(sec.pos) < 0.6) {
+            sec.fissioned = true;
+            sec.fissionTime = time;
+
+            // Secondary Fission Shockwave!
+            cycle.shockwaves.push({ x: sec.pos.x, z: sec.pos.z, time, energy: 1.6 * forceStrength });
+
+            // Eject secondary neutrons (neutrons index 4, 5, 6, 7)
+            for (let k = 4; k < freeNeutrons.current.length; k++) {
+              const secN = freeNeutrons.current[k];
+              if (!secN.active) {
+                secN.pos.copy(sec.pos);
+                const a = Math.random() * Math.PI * 2;
+                const spd = (0.08 + Math.random() * 0.04) * particleSpeed;
+                secN.vel.set(Math.cos(a) * spd, (Math.random() - 0.5) * 0.03, Math.sin(a) * spd);
+                secN.active = true;
+                secN.life = 0;
+                break;
+              }
+            }
+          }
+        });
+
+        if (n.pos.length() > 9 || n.life > 4.0) {
+          n.active = false;
+        }
+      }
+    }
+
+    // Reset cycle after full cascade completes (6.5s)
+    if (cycle.stage >= 2 && time - cycle.primaryFissionTime > 6.5 * (1 / particleSpeed)) {
+      cycle.stage = 0; // Reset to INTACT
+      cycle.stageStartTime = time;
+
+      // Reset central core & daughter fragments
+      if (bariumRef.current) bariumRef.current.position.set(0, 0, 0);
+      if (kryptonRef.current) kryptonRef.current.position.set(0, 0, 0);
+      secondaryNuclei.forEach((sec) => {
+        sec.fissioned = false;
+      });
+      for (let i = 1; i < freeNeutrons.current.length; i++) {
+        freeNeutrons.current[i].active = false;
+      }
+      // Re-trigger incident neutron
+      incNeutron.pos.set(-7, 0, 0);
+      incNeutron.vel.set(0.08 * particleSpeed, 0, 0);
+      incNeutron.active = true;
+    }
+
+    // ── DEFORM SPACETIME FABRIC GRID & CALCULATE SHOCKWAVES ──
+    if (gridGeomRef.current) {
+      const posAttr = gridGeomRef.current.attributes.position;
+      const colorAttr = gridGeomRef.current.attributes.color;
+
+      if (initialPositions.current.length === 0) {
+        for (let i = 0; i < posAttr.count; i++) {
+          initialPositions.current.push({ x: posAttr.getX(i), y: posAttr.getY(i) });
+        }
+      }
+
+      const coords = initialPositions.current;
+      // Prune old shockwaves (> 3s old)
+      cycle.shockwaves = cycle.shockwaves.filter((sw) => time - sw.time < 3.2);
+
+      for (let i = 0; i < coords.length; i++) {
+        const { x, y } = coords[i];
+
+        // 1. Central Core Gravitational / Potential Well
+        const dCenter = Math.sqrt(x * x + y * y);
+        let depth = -1.6 * forceStrength / (dCenter * 0.75 + 0.5);
+
+        // 2. Secondary Nuclei Wells
+        secondaryNuclei.forEach((sec) => {
+          const dSec = Math.sqrt((x - sec.pos.x) ** 2 + (y - sec.pos.z) ** 2);
+          depth += -0.35 * forceStrength / (dSec * 1.1 + 0.4);
+        });
+
+        // 3. Fission Energy Shockwave Ripples
+        let shockHeight = 0;
+        cycle.shockwaves.forEach((sw) => {
+          const dSW = Math.sqrt((x - sw.x) ** 2 + (y - sw.z) ** 2);
+          const age = time - sw.time;
+          const waveFront = age * 5.0 * particleSpeed;
+          const distFromFront = Math.abs(dSW - waveFront);
+          if (distFromFront < 1.4) {
+            const damp = Math.exp(-age * 1.2) * Math.exp(-dSW * 0.18);
+            shockHeight += Math.sin((dSW - waveFront) * 4.0) * damp * sw.energy * 0.8;
+          }
+        });
+
+        const totalZ = depth + shockHeight;
+        posAttr.setZ(i, totalZ);
+
+        // 4. Heat / Radiation Vertex Coloring
+        const absZ = Math.abs(totalZ);
+        const shockMag = Math.min(Math.abs(shockHeight) * 1.2, 1.0);
+
+        let r = THREE.MathUtils.lerp(0.1, 0.95, Math.min(absZ / 2.0, 1.0));
+        let g = THREE.MathUtils.lerp(0.4, 0.3, shockMag);
+        let b = THREE.MathUtils.lerp(0.8, 0.05, Math.min(absZ / 1.5, 1.0));
+
+        if (shockMag > 0.15) {
+          // Blaze into atomic orange/red during fission shockwave
+          r = THREE.MathUtils.lerp(r, 1.0, shockMag);
+          g = THREE.MathUtils.lerp(g, 0.5, shockMag);
+          b = THREE.MathUtils.lerp(b, 0.1, shockMag);
+        }
+
+        colorAttr.setXYZ(i, r, g, b);
+      }
+
+      posAttr.needsUpdate = true;
+      colorAttr.needsUpdate = true;
+    }
+
+    // ── SWARM OF CHERENKOV / GAMMA RADIATION PARTICLES ──
+    if (radiationParticlesRef.current) {
+      const ptsAttr = radiationParticlesRef.current.geometry.attributes.position;
+      for (let i = 0; i < radCount; i++) {
+        const pt = radData[i];
+        pt.angle += pt.speed * particleSpeed;
+        const px = Math.cos(pt.angle) * pt.radius;
+        const pz = Math.sin(pt.angle) * pt.radius;
+        const dC = Math.sqrt(px * px + pz * pz);
+        const py = -1.4 * forceStrength / (dC * 0.75 + 0.5) + pt.y;
+
+        ptsAttr.setXYZ(i, px, py, pz);
+      }
+      ptsAttr.needsUpdate = true;
+    }
+
+    // Central Core rotation & vibration
+    if (centralCoreRef.current && cycle.stage === 0) {
+      centralCoreRef.current.rotation.y = time * 0.5;
+      centralCoreRef.current.rotation.z = Math.sin(time * 2) * 0.08;
+    }
+  });
+
+  return (
+    <>
+      <ambientLight intensity={0.7} />
+      <directionalLight position={[10, 15, 10]} intensity={1.8} color="#FF6600" />
+      <pointLight ref={flashLightRef} position={[0, 0, 0]} intensity={4} color="#FFAA00" distance={12} />
+
+      {/* ── CENTRAL U-235 UNBROKEN NUCLEUS (Stage 0, 1) ── */}
+      {fissionCycle.current.stage <= 1 && (
+        <group ref={centralCoreRef} position={[0, -0.6, 0]}>
+          {/* Outer glowing plasma envelope */}
+          <mesh>
+            <sphereGeometry args={[0.48, 32, 32]} />
+            <meshStandardMaterial
+              color="#EF4444"
+              roughness={0.2}
+              metalness={0.6}
+              emissive="#FF3300"
+              emissiveIntensity={0.8}
+            />
+          </mesh>
+          {/* U-235 Nucleons Cluster */}
+          {u235Nucleons.map((n, idx) => (
+            <mesh key={idx} position={n.basePos}>
+              <sphereGeometry args={[n.size, 16, 16]} />
+              <meshStandardMaterial
+                color={n.isProton ? '#FF4400' : '#00E5FF'}
+                emissive={n.isProton ? '#FF2200' : '#0099FF'}
+                emissiveIntensity={0.6}
+              />
+            </mesh>
+          ))}
+        </group>
+      )}
+
+      {/* ── DAUGHTER NUCLEI (Stage 2, 3, 4: BARIUM-141 & KRYPTON-92) ── */}
+      {fissionCycle.current.stage >= 2 && (
+        <group position={[0, -0.6, 0]}>
+          {/* Barium-141 Fragment */}
+          <group ref={bariumRef}>
+            <mesh>
+              <sphereGeometry args={[0.34, 24, 24]} />
+              <meshStandardMaterial color="#8B5CF6" emissive="#7C3AED" emissiveIntensity={0.9} />
+              <pointLight color="#8B5CF6" intensity={2} distance={4} />
+            </mesh>
+          </group>
+
+          {/* Krypton-92 Fragment */}
+          <group ref={kryptonRef}>
+            <mesh>
+              <sphereGeometry args={[0.26, 24, 24]} />
+              <meshStandardMaterial color="#10B981" emissive="#059669" emissiveIntensity={0.9} />
+              <pointLight color="#10B981" intensity={2} distance={4} />
+            </mesh>
+          </group>
+        </group>
+      )}
+
+      {/* ── SECONDARY U-235 NUCLEI RING ON FABRIC ── */}
+      {secondaryNuclei.map((sec, idx) => (
+        <group key={idx} position={sec.pos}>
+          <mesh scale={sec.fissioned ? [1.4, 0.2, 1.4] : [0.35, 0.35, 0.35]}>
+            <sphereGeometry args={[1, 20, 20]} />
+            <meshStandardMaterial
+              color={sec.fissioned ? '#FF0000' : '#F97316'}
+              emissive={sec.fissioned ? '#FF5500' : '#EA580C'}
+              emissiveIntensity={sec.fissioned ? 1.5 : 0.6}
+            />
+          </mesh>
+          {sec.fissioned && (
+            <pointLight color="#FF4400" intensity={3} distance={5} />
+          )}
+        </group>
+      ))}
+
+      {/* ── FREE EJECTED NEUTRONS (n0 Particles) ── */}
+      {freeNeutrons.current.map(
+        (n, idx) =>
+          n.active && (
+            <mesh key={idx} position={n.pos}>
+              <sphereGeometry args={[0.11, 16, 16]} />
+              <meshBasicMaterial color={n.color} />
+              <pointLight color={n.color} intensity={2.5} distance={3} />
+            </mesh>
+          )
+      )}
+
+      {/* ── CHERENKOV & GAMMA RADIATION SWARM ── */}
+      <points ref={radiationParticlesRef}>
+        <bufferGeometry>
+          <bufferAttribute attach="attributes-position" args={[radPositions, 3]} />
+        </bufferGeometry>
+        <pointsMaterial
+          size={0.15}
+          map={particleTexture}
+          transparent
+          opacity={0.85}
+          sizeAttenuation
+          blending={THREE.AdditiveBlending}
+        />
+      </points>
+
+      {/* ── SPACETIME & ENERGY DEFORMABLE FABRIC GRID ── */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
+        <planeGeometry ref={gridGeomRef} args={[gridWidth, gridHeight, segments, segments]}>
+          <bufferAttribute attach="attributes-color" args={[gridColors, 3]} />
+        </planeGeometry>
+        <meshBasicMaterial vertexColors wireframe transparent opacity={0.5} />
+      </mesh>
+    </>
+  );
+}
+
+/* ──────────────────────────────────────────────────────────────────────────────
    MAIN HERO CANVAS WRAPPER
    ────────────────────────────────────────────────────────────────────────────── */
 export default function HeroPhysicsUniverse({
-  mode = 'gravity',
+  mode = 'nuclear',
   forceStrength = 1.0,
   particleSpeed = 1.0,
 }: HeroPhysicsUniverseProps) {
@@ -680,7 +1167,11 @@ export default function HeroPhysicsUniverse({
         {mode === 'waves' && (
           <WaveOpticsScene forceStrength={forceStrength} particleSpeed={particleSpeed} />
         )}
+        {mode === 'nuclear' && (
+          <NuclearChainReactionScene forceStrength={forceStrength} particleSpeed={particleSpeed} />
+        )}
       </Canvas>
     </div>
   );
 }
+

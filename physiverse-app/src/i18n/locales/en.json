@@ -1,0 +1,114 @@
+{
+  "nav": {
+    "home": "Home",
+    "learn": "Learn",
+    "simulations": "Simulations",
+    "explore": "Explore",
+    "formulaExplorer": "Formula Explorer",
+    "aiTutor": "AI Tutor",
+    "community": "Community",
+    "dashboard": "Dashboard",
+    "bookmarks": "Bookmarks",
+    "settings": "Settings"
+  },
+  "common": {
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "all": "All",
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Retry",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "share": "Share",
+    "bookmark": "Bookmark",
+    "bookmarked": "Bookmarked",
+    "comingSoon": "Coming Soon",
+    "noResults": "No results found",
+    "showMore": "Show More",
+    "showLess": "Show Less"
+  },
+  "difficulty": {
+    "beginner": "Beginner",
+    "intermediate": "Intermediate",
+    "advanced": "Advanced"
+  },
+  "categories": {
+    "mechanics": "Mechanics",
+    "optics": "Optics",
+    "quantum": "Quantum",
+    "electricity": "Electricity",
+    "magnetism": "Magnetism",
+    "electromagnetism": "Electromagnetism",
+    "astrophysics": "Astrophysics",
+    "thermodynamics": "Thermodynamics",
+    "wave-physics": "Wave Physics",
+    "nuclear-physics": "Nuclear Physics",
+    "modern-physics": "Modern Physics"
+  },
+  "modes": {
+    "explore": "Explore",
+    "learn": "Learn",
+    "quiz": "Quiz",
+    "compare": "Compare"
+  },
+  "visualization": {
+    "launchSimulation": "Launch Simulation",
+    "exploreIn3D": "Explore in 3D",
+    "startLearning": "Start Learning",
+    "takeQuiz": "Take Quiz",
+    "viewFormulas": "View Formulas",
+    "relatedTopics": "Related Topics",
+    "learningObjectives": "Learning Objectives",
+    "estimatedTime": "Estimated Time",
+    "components": "{{count}} components",
+    "parts": "{{count}} parts"
+  },
+  "quiz": {
+    "question": "Question {{current}} of {{total}}",
+    "score": "Score: {{score}}",
+    "correct": "Correct!",
+    "incorrect": "Incorrect",
+    "explanation": "Explanation",
+    "hint": "Hint",
+    "submit": "Submit Answer",
+    "nextQuestion": "Next Question",
+    "results": "Quiz Results",
+    "tryAgain": "Try Again",
+    "perfect": "Perfect Score!"
+  },
+  "search": {
+    "placeholder": "Search visualizations, formulas, scientists...",
+    "recentSearches": "Recent Searches",
+    "clearHistory": "Clear History",
+    "filters": "Filters",
+    "clearFilters": "Clear Filters",
+    "results": "{{count}} results"
+  },
+  "settings": {
+    "title": "Settings",
+    "quality": "Render Quality",
+    "language": "Language",
+    "theme": "Theme",
+    "accessibility": "Accessibility",
+    "reducedMotion": "Reduced Motion",
+    "highContrast": "High Contrast",
+    "fontSize": "Font Size",
+    "screenReader": "Screen Reader Mode"
+  },
+  "hero": {
+    "badge": "The Future of Physics Education",
+    "title": "Physiverse",
+    "subtitle": "Immersive 3D simulations, interactive formula explorers, and AI-powered tutoring. Physics has never been this tangible.",
+    "exploreBtn": "Explore Simulations",
+    "learnBtn": "Start Learning"
+  }
+}

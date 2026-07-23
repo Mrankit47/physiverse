@@ -15,11 +15,13 @@ import {
   X,
   Zap,
   Orbit,
+  Layers,
 } from 'lucide-react';
 
 const navLinks = [
   { href: '/learn', label: 'Learn', icon: BookOpen },
   { href: '/simulations', label: 'Simulations', icon: Orbit },
+  { href: '/explore', label: '3D Models', icon: Layers },
   { href: '/virtual-labs', label: 'Virtual Labs', icon: FlaskConical },
   { href: '/formula-explorer', label: 'Formula Explorer', icon: Calculator },
   { href: '/ai-tutor', label: 'AI Tutor', icon: Bot },

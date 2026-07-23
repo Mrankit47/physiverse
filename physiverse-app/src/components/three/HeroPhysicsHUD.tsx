@@ -81,7 +81,7 @@ export default function HeroPhysicsHUD({
   const [showSettings, setShowSettings] = useState(false);
 
   return (
-    <div className="absolute inset-0 pointer-events-none z-20 flex flex-col justify-between p-4 sm:p-6 md:p-8 pt-20 sm:pt-24 pb-2 sm:pb-4">
+    <div className="absolute inset-0 pointer-events-none z-20 flex flex-col justify-between px-4 pt-20 pb-2 sm:px-6 sm:pt-24 sm:pb-4 md:px-8 md:pt-28 md:pb-6">
       {/* Top Bar: Quick Settings Toggle Button */}
       <div className="flex justify-end items-start w-full">
         <button
@@ -100,7 +100,7 @@ export default function HeroPhysicsHUD({
             initial={{ opacity: 0, scale: 0.95, y: -10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: -10 }}
-            className="absolute top-20 right-4 sm:right-8 w-72 pointer-events-auto glass rounded-2xl p-4 border border-[var(--border-default)] shadow-2xl backdrop-blur-xl"
+            className="absolute top-32 sm:top-36 md:top-40 right-4 sm:right-8 w-72 pointer-events-auto glass rounded-2xl p-4 border border-[var(--border-default)] shadow-2xl backdrop-blur-xl"
           >
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2 text-xs font-bold text-[var(--text-heading)]">

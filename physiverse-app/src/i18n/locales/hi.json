@@ -1,0 +1,114 @@
+{
+  "nav": {
+    "home": "होम",
+    "learn": "सीखें",
+    "simulations": "सिमुलेशन",
+    "explore": "अन्वेषण",
+    "formulaExplorer": "सूत्र एक्सप्लोरर",
+    "aiTutor": "AI ट्यूटर",
+    "community": "समुदाय",
+    "dashboard": "डैशबोर्ड",
+    "bookmarks": "बुकमार्क",
+    "settings": "सेटिंग्स"
+  },
+  "common": {
+    "search": "खोजें",
+    "filter": "फ़िल्टर",
+    "sort": "क्रमबद्ध करें",
+    "all": "सभी",
+    "loading": "लोड हो रहा है...",
+    "error": "कुछ गलत हो गया",
+    "retry": "पुनः प्रयास करें",
+    "close": "बंद करें",
+    "back": "वापस",
+    "next": "अगला",
+    "previous": "पिछला",
+    "save": "सहेजें",
+    "cancel": "रद्द करें",
+    "delete": "हटाएं",
+    "edit": "संपादित करें",
+    "view": "देखें",
+    "share": "साझा करें",
+    "bookmark": "बुकमार्क",
+    "bookmarked": "बुकमार्क किया",
+    "comingSoon": "जल्द आ रहा है",
+    "noResults": "कोई परिणाम नहीं मिला",
+    "showMore": "और दिखाएं",
+    "showLess": "कम दिखाएं"
+  },
+  "difficulty": {
+    "beginner": "शुरुआती",
+    "intermediate": "मध्यवर्ती",
+    "advanced": "उन्नत"
+  },
+  "categories": {
+    "mechanics": "यांत्रिकी",
+    "optics": "प्रकाशिकी",
+    "quantum": "क्वांटम",
+    "electricity": "विद्युत",
+    "magnetism": "चुंबकत्व",
+    "electromagnetism": "विद्युत चुंबकत्व",
+    "astrophysics": "खगोल भौतिकी",
+    "thermodynamics": "ऊष्मागतिकी",
+    "wave-physics": "तरंग भौतिकी",
+    "nuclear-physics": "नाभिकीय भौतिकी",
+    "modern-physics": "आधुनिक भौतिकी"
+  },
+  "modes": {
+    "explore": "अन्वेषण",
+    "learn": "सीखें",
+    "quiz": "प्रश्नोत्तरी",
+    "compare": "तुलना"
+  },
+  "visualization": {
+    "launchSimulation": "सिमुलेशन शुरू करें",
+    "exploreIn3D": "3D में खोजें",
+    "startLearning": "सीखना शुरू करें",
+    "takeQuiz": "प्रश्नोत्तरी दें",
+    "viewFormulas": "सूत्र देखें",
+    "relatedTopics": "संबंधित विषय",
+    "learningObjectives": "सीखने के उद्देश्य",
+    "estimatedTime": "अनुमानित समय",
+    "components": "{{count}} घटक",
+    "parts": "{{count}} भाग"
+  },
+  "quiz": {
+    "question": "प्रश्न {{current}} / {{total}}",
+    "score": "स्कोर: {{score}}",
+    "correct": "सही!",
+    "incorrect": "गलत",
+    "explanation": "व्याख्या",
+    "hint": "संकेत",
+    "submit": "उत्तर जमा करें",
+    "nextQuestion": "अगला प्रश्न",
+    "results": "प्रश्नोत्तरी परिणाम",
+    "tryAgain": "पुनः प्रयास करें",
+    "perfect": "पूर्ण अंक!"
+  },
+  "search": {
+    "placeholder": "विज़ुअलाइज़ेशन, सूत्र, वैज्ञानिक खोजें...",
+    "recentSearches": "हाल की खोजें",
+    "clearHistory": "इतिहास साफ़ करें",
+    "filters": "फ़िल्टर",
+    "clearFilters": "फ़िल्टर साफ़ करें",
+    "results": "{{count}} परिणाम"
+  },
+  "settings": {
+    "title": "सेटिंग्स",
+    "quality": "रेंडर गुणवत्ता",
+    "language": "भाषा",
+    "theme": "थीम",
+    "accessibility": "पहुँच",
+    "reducedMotion": "कम गति",
+    "highContrast": "उच्च कंट्रास्ट",
+    "fontSize": "फ़ॉन्ट आकार",
+    "screenReader": "स्क्रीन रीडर मोड"
+  },
+  "hero": {
+    "badge": "भौतिकी शिक्षा का भविष्य",
+    "title": "फिज़िवर्स",
+    "subtitle": "इमर्सिव 3D सिमुलेशन, इंटरैक्टिव सूत्र एक्सप्लोरर, और AI-संचालित ट्यूटरिंग। भौतिकी कभी इतनी वास्तविक नहीं रही।",
+    "exploreBtn": "सिमुलेशन देखें",
+    "learnBtn": "सीखना शुरू करें"
+  }
+}

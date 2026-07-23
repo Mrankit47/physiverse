@@ -11,7 +11,6 @@ import {
   BookOpen,
   Calculator,
   HelpCircle,
-  Bookmark,
   Settings,
   Info,
 } from 'lucide-react';

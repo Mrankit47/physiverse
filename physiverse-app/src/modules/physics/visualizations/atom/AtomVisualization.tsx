@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useRef, useMemo, useEffect } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { OrbitControls, Html, Sphere, Ring, Trail, Line } from '@react-three/drei';
+import { OrbitControls, Html, Sphere, Line } from '@react-three/drei';
 import * as THREE from 'three';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -11,7 +11,6 @@ import {
   RotateCcw,
   Maximize,
   Minimize,
-  Sparkles,
   Info,
   BookOpen,
   Sliders,
@@ -202,7 +201,6 @@ function OrbitingElectron({
   onSelectParticle: (info: ParticleInfo) => void;
 }) {
   const electronRef = useRef<THREE.Mesh>(null);
-  const trailRef = useRef<THREE.Group>(null);
   const id = `electron-shell${shell.n}-idx${index}`;
   const isHovered = hoveredId === id;
 

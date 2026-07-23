@@ -6,21 +6,13 @@ import { OrbitControls, Html, Sphere, Line } from '@react-three/drei';
 import * as THREE from 'three';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Play,
-  Pause,
-  RotateCcw,
   Zap,
-  Flame,
-  BookOpen,
   Sliders,
   ChevronRight,
   ChevronLeft,
   X,
-  Maximize,
-  Minimize,
   Atom as AtomIcon,
   Sparkles,
-  Info,
 } from 'lucide-react';
 
 /* ═══════════════════════════════════════════════════════════════
@@ -314,8 +306,7 @@ export default function BohrVisualization() {
   const [selectedElement, setSelectedElement] = useState<string>('Hydrogen');
   const [excitedState, setExcitedState] = useState<{ shell: number; index: number; targetShell: number } | null>(null);
   const [photonEvent, setPhotonEvent] = useState<{ type: 'absorb' | 'emit'; fromShell: number; toShell: number; color: string } | null>(null);
-  const [isPaused, setIsPaused] = useState<boolean>(false);
-  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+  const isPaused = false;
   const [learningStep, setLearningStep] = useState<number | null>(null);
 
   const element = ELEMENTS[selectedElement];

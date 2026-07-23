@@ -35,7 +35,7 @@ const plugin: VisualizationPlugin = {
   component: lazy(() => import('./index')),
 };
 
-export function registerVisualization(registry: VisualizationRegistry): void {
+export function registerVisualization(_registry: VisualizationRegistry): void {
   // Uncomment the line below when using this template for a real visualization
   // registry.register(plugin);
 }

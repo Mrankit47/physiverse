@@ -41,9 +41,9 @@ export function discoverAndRegisterAll(): void {
 
     for (const key of keys) {
       try {
-        const module = context(key);
-        if (module.registerVisualization) {
-          module.registerVisualization(registry);
+        const loadedMod = context(key);
+        if (loadedMod.registerVisualization) {
+          loadedMod.registerVisualization(registry);
         }
       } catch (err) {
         console.error(`[Physiverse] Failed to load visualization module: ${key}`, err);

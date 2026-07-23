@@ -2,25 +2,21 @@
 
 import React, { useState, useRef, useMemo, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Html, Sphere, Stars, Ring } from '@react-three/drei';
+import { OrbitControls, Sphere, Stars } from '@react-three/drei';
 import * as THREE from 'three';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Play,
   Pause,
   RotateCcw,
-  Sparkles,
   Flame,
-  Zap,
   Maximize,
   Minimize,
   BookOpen,
-  Info,
   ChevronRight,
   ChevronLeft,
   X,
   Activity,
-  Compass,
 } from 'lucide-react';
 
 /* ═══════════════════════════════════════════════════════════════
@@ -320,7 +316,7 @@ function StarCore({ timelineProgress }: { timelineProgress: number }) {
 export default function SupernovaVisualization() {
   const [progress, setProgress] = useState<number>(0.0);
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
-  const [autoRotate, setAutoRotate] = useState<boolean>(true);
+  const autoRotate = true;
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const [learningStep, setLearningStep] = useState<number | null>(null);
 

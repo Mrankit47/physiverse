@@ -21,7 +21,6 @@ import {
   Loader2,
 } from 'lucide-react';
 import { useRegistry } from '@/hooks/useRegistry';
-import type { PhysicsCategory } from '@/types';
 
 const categories = ['All', 'Mechanics', 'Waves', 'Electromagnetism', 'Optics', 'Quantum', 'Astrophysics'];
 

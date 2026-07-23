@@ -9,7 +9,7 @@
 
 import type { VisualizationComponentProps } from '@/types';
 
-export default function TemplateVisualization({ metadata, onReady }: VisualizationComponentProps) {
+export default function TemplateVisualization({ metadata, onReady: _onReady }: VisualizationComponentProps) {
   // Call onReady when the visualization is fully loaded
   // useEffect(() => { onReady?.(); }, [onReady]);
 
